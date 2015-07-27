@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 import zipfile
 from lxml import etree
 
@@ -8,18 +10,17 @@ WPREFIXES = {
 class Document :
     
     _doc = ''
-    _header = ''
-    _body = ''
-    _footer = ''
+    files = {}
 
     def __init__(self, filename) :
         if not zipfile.is_zipfile(filename) :
             raise TypeError("Not an correct docx file.")
 
         self._doc = zipfile.ZipFile(filename)
-        #self._header = etree.fromstring(self._doc.read('word/header1.xml'))
-        self._body = etree.fromstring(self._doc.read('word/document.xml'))
-        #self._footer = etree.fromstring(self._doc.read('word/footer2.xml'))
+        #scan zipfile for header/document and footer xml files
+        for path in self._doc.namelist() :
+            if path == 'word/document.xml' or 'header' in path or 'footer' in path :
+                self.files[path] = etree.fromstring(self._doc.read(path))
         
     #read document header as xml and returning text as list
     def readHeader(self) :
@@ -29,40 +30,36 @@ class Document :
     def readDocument(self) :
         return self._readTextFromXML(self._body)
 
+    #save document with new values
     def save(self, filename) :
         docxFile = zipfile.ZipFile(filename, mode='w', compression=zipfile.ZIP_DEFLATED)
 
-        #headerString = etree.tostring(self._header, pretty_print=True)
-        #docxFile.writestr('word/header1.xml', headerString)
-
-        bodyString = etree.tostring(self._body, pretty_print=True)
-        docxFile.writestr('word/document.xml', bodyString)
-
+        #copy from old docx every file except the files that are in files list
         for path in self._doc.namelist() :
-            if path != 'word/document.xml' :
+            if path not in self.files :
                 docxFile = self.copyToXML(docxFile, path)
+
+        #add files from file list to docx
+        for key, value in self.files.items() :
+            docxFile.writestr(key, etree.tostring(value, pretty_print=True))
 
         docxFile.close()
 
     #search and replace function
     def searchAndReplace(self, regex, replacement) :
-        
-        for el in self._body.iter() :
-            if el.tag == WPREFIXES['w'] + 'p' :
-                for e in el.iter() :
-                    if e.tag == WPREFIXES['w'] + 't' :
-                        e.text = e.text.replace(regex, replacement)
+        for key, value in self.files.items() :
+            for el in value.iter() :
+                if el.tag == WPREFIXES['w'] + 'p' :
+                    for e in el.iter() :
+                        if e.tag == WPREFIXES['w'] + 't' :
+                            e.text = e.text.replace(regex, replacement)
 
     #copy function of docx
     def copyFile(self, filename) :
 
         newFile = zipfile.ZipFile(filename, mode="w", compression=zipfile.ZIP_DEFLATED)
         for path in self._doc.namelist() :
-            if path != 'word/document.xml' :
-                newFile = self.copyToXML(newFile, path)
-
-        bodyString = etree.tostring(self._body, pretty_print=True)
-        newFile.writestr('word/document.xml', bodyString)
+            newFile = self.copyToXML(newFile, path)
 
         newFile.close()
 

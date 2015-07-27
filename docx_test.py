@@ -8,5 +8,6 @@ document = Document("test.docx")
 
 document.searchAndReplace("klaas", "jan")
 document.searchAndReplace("Test", "Henk")
+document.searchAndReplace("Piet", "Frits")
 
 document.save("test1.docx")
