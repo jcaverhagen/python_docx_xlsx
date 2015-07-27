@@ -70,15 +70,12 @@ class Document :
 
     #search for text tag in xml files
     def _readTextFromXML(self, xml) :
-        paraList = []
+        returnList = []
         for el in xml.iter() :
             if el.tag == WPREFIXES['w'] + 'p' :
                 paraList.append(el)
-
-        returnList = []
-        for para in paraList :
-            for p in para.iter() :
-                if p.tag == WPREFIXES['w'] + 't' :
-                    returnList.append(p.text)
+                for e in el.iter() :
+                    if e.tag == WPREFIXES['w'] + 'p' :
+                        returnList.append(e.text)
 
         return returnList
