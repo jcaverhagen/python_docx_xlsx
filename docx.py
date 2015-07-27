@@ -29,8 +29,8 @@ class Document :
     def readDocument(self) :
         return self._readTextFromXML(self._body)
 
-    def save(self) :
-        docxFile = zipfile.ZipFile('testnaam.docx', mode='w', compression=zipfile.ZIP_DEFLATED)
+    def save(self, filename) :
+        docxFile = zipfile.ZipFile(filename, mode='w', compression=zipfile.ZIP_DEFLATED)
 
         #headerString = etree.tostring(self._header, pretty_print=True)
         #docxFile.writestr('word/header1.xml', headerString)
@@ -38,28 +38,32 @@ class Document :
         bodyString = etree.tostring(self._body, pretty_print=True)
         docxFile.writestr('word/document.xml', bodyString)
 
-        docxFile = self.copyToXML(docxFile, 'docProps/core.xml')
-        docxFile = self.copyToXML(docxFile, 'docProps/app.xml')
-        docxFile = self.copyToXML(docxFile, 'word/webSettings.xml')
-        docxFile = self.copyToXML(docxFile, '_rels/.rels')
-        docxFile = self.copyToXML(docxFile, 'word/_rels/document.xml.rels')
-        docxFile = self.copyToXML(docxFile, 'word/theme/theme1.xml')
-        docxFile = self.copyToXML(docxFile, 'word/fontTable.xml')
-        docxFile = self.copyToXML(docxFile, 'word/settings.xml')
-        docxFile = self.copyToXML(docxFile, 'word/styles.xml')
-        docxFile = self.copyToXML(docxFile, 'word/stylesWithEffects.xml')
-        docxFile = self.copyToXML(docxFile, 'word/endnotes.xml')
-        docxFile = self.copyToXML(docxFile, 'word/footnotes.xml')
-        docxFile = self.copyToXML(docxFile, '[Content_Types].xml')
+        for path in self._doc.namelist() :
+            if path != 'word/document.xml' :
+                docxFile = self.copyToXML(docxFile, path)
 
         docxFile.close()
+
+    #search and replace function
+    def searchAndReplace(self, regex, replacement) :
+        
+        for el in self._body.iter() :
+            if el.tag == WPREFIXES['w'] + 'p' :
+                for e in el.iter() :
+                    if e.tag == WPREFIXES['w'] + 't' :
+                        e.text = e.text.replace(regex, replacement)
 
     #copy function of docx
     def copyFile(self, filename) :
 
         newFile = zipfile.ZipFile(filename, mode="w", compression=zipfile.ZIP_DEFLATED)
         for path in self._doc.namelist() :
-            newFile = self.copyToXML(newFile, path)
+            if path != 'word/document.xml' :
+                newFile = self.copyToXML(newFile, path)
+
+        bodyString = etree.tostring(self._body, pretty_print=True)
+        newFile.writestr('word/document.xml', bodyString)
+
         newFile.close()
 
     #copying file from old zip to new zip

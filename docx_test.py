@@ -6,6 +6,7 @@ document = Document("test.docx")
 #for d in docData :
 #	print (d)
 
-document.copyFile("nieuweNaam.docx")
+document.searchAndReplace("klaas", "jan")
+document.searchAndReplace("Test", "Henk")
 
-#document.save()
+document.save("test1.docx")
