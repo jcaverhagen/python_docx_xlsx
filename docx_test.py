@@ -1,8 +1,9 @@
 from docx import Document
 
-document = Document()
-openDoc = document.openFile("test.docx")
+document = Document("test.docx")
 
-docData = document.readHeader(openDoc)
+docData = document.readDocument()
 for d in docData :
-	print d
+	print (d)
+
+document.save()
