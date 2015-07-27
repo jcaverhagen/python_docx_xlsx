@@ -1,2 +1,7 @@
 # python_docx
-Editing docx files with python
+
+Simple docx editor written in python.
+
+- copy function
+- search and replace function
+- including header / footer search and replace
