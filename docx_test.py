@@ -2,8 +2,10 @@ from docx import Document
 
 document = Document("test.docx")
 
-docData = document.readDocument()
-for d in docData :
-	print (d)
+#docData = document.readDocument()
+#for d in docData :
+#	print (d)
 
-document.save()
+document.copyFile("nieuweNaam.docx")
+
+#document.save()

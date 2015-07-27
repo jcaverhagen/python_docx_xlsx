@@ -17,7 +17,7 @@ class Document :
             raise TypeError("Not an correct docx file.")
 
         self._doc = zipfile.ZipFile(filename)
-        self._header = etree.fromstring(self._doc.read('word/header1.xml'))
+        #self._header = etree.fromstring(self._doc.read('word/header1.xml'))
         self._body = etree.fromstring(self._doc.read('word/document.xml'))
         #self._footer = etree.fromstring(self._doc.read('word/footer2.xml'))
         
@@ -32,8 +32,8 @@ class Document :
     def save(self) :
         docxFile = zipfile.ZipFile('testnaam.docx', mode='w', compression=zipfile.ZIP_DEFLATED)
 
-        headerString = etree.tostring(self._header, pretty_print=True)
-        docxFile.writestr('word/header1.xml', headerString)
+        #headerString = etree.tostring(self._header, pretty_print=True)
+        #docxFile.writestr('word/header1.xml', headerString)
 
         bodyString = etree.tostring(self._body, pretty_print=True)
         docxFile.writestr('word/document.xml', bodyString)
@@ -53,6 +53,14 @@ class Document :
         docxFile = self.copyToXML(docxFile, '[Content_Types].xml')
 
         docxFile.close()
+
+    #copy function of docx
+    def copyFile(self, filename) :
+
+        newFile = zipfile.ZipFile(filename, mode="w", compression=zipfile.ZIP_DEFLATED)
+        for path in self._doc.namelist() :
+            newFile = self.copyToXML(newFile, path)
+        newFile.close()
 
     #copying file from old zip to new zip
     def copyToXML(self, docx, path) :
