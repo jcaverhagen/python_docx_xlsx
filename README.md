@@ -1,4 +1,4 @@
-# python_docx
+# python docx
 
 Simple docx editor written in python.
 
