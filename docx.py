@@ -75,6 +75,24 @@ class Document :
                     if position == 'first' : el.insert(0, hyperlink.get())
                     else : el.append(hyperlink.get())
 
+    #method to make specific test an hyperlink
+    def makeTextHyperlink(self, text, url) :
+        for el in self.files['word/document.xml'].iter() :
+            if el.tag == WPREFIXES['w'] + 'p' :
+                for e in el.iter() :
+                    addLink = False
+                    if e.tag == WPREFIXES['w'] + 't' :
+                        if text in e.text :
+                            e.text = e.text.replace(text, '')
+                            addLink = True
+                    if addLink :
+                        newRelationID = self._getHighestRelationId() + 1
+                        relations = self.files['word/_rels/document.xml.rels']
+                        
+                        hyperlink = Hyperlink(text, str(newRelationID), url)
+                        relations.append(hyperlink.getRelation())
+                        el.append(hyperlink.get())
+
     #search position of paragraph
     def _searchParagraphPosition(self, text) :
         position = 0
