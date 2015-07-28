@@ -2,6 +2,7 @@
 
 import zipfile
 from lxml import etree
+from items.paragraph import Paragraph
 
 WPREFIXES = {
         'w' : '{http://schemas.openxmlformats.org/wordprocessingml/2006/main}'
@@ -29,6 +30,17 @@ class Document :
     #read document body as xml and returning text as list
     def readDocument(self) :
         return self._readTextFromXML(self._body)
+
+    #add paragraph as first
+    def addParagraph(self, text) :
+        doc = self.files['word/document.xml']
+        for el in doc.iter() :
+            if el.tag == WPREFIXES['w'] + 'body' :
+                paragraph = Paragraph()
+                paragraph.setText(text)
+                paraElement = paragraph.get()
+                el.append(paraElement)
+
 
     #save document with new values
     def save(self, filename) :

@@ -6,8 +6,7 @@ document = Document("test.docx")
 #for d in docData :
 #	print (d)
 
-document.searchAndReplace("klaas", "jan")
-document.searchAndReplace("Test", "Henk")
-document.searchAndReplace("Piet", "Frits")
+#document.searchAndReplace("klaas", "jan")
+document.addParagraph("vanuit python toegevoegd")
 
 document.save("test1.docx")
