@@ -72,13 +72,10 @@ class Document :
         doc = self.files['word/document.xml']
         for el in doc.iter() :
             if el.tag == WPREFIXES['w'] + 'body' :
-                paragraph = Paragraph().get()
-                
                 hyperlink = Hyperlink(text, str(newRelationID), url)
-                paragraph.append(hyperlink.get())
                 relations.append(hyperlink.getRelation())
 
-                el.append(paragraph)
+                el.append(hyperlink.get())
 
     #search for highest id in relations xml
     def _getHighestRelationId(self) :

@@ -26,7 +26,8 @@ class Hyperlink :
 		self._rel_id = rel_id
 		self._url = url
 
-		self._hyperlink = Element().createElement('hyperlink', attr={'id' : 'rId' + rel_id})
+		self._hyperlink = Element().createElement('p')
+		hyperlinkEl = (Element().createElement('hyperlink', attr={'id' : 'rId' + rel_id}))
 		
 		run = Element().createElement('r')
 		
@@ -39,7 +40,8 @@ class Hyperlink :
 		textEl.text = text
 		run.append(textEl)
 
-		self._hyperlink.append(run)
+		hyperlinkEl.append(run)
+		self._hyperlink.append(hyperlinkEl)
 
 	def get(self) :
 		return self._hyperlink
