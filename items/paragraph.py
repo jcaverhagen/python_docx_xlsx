@@ -18,7 +18,6 @@ class Paragraph :
 	_textEl = ''
 
 	def __init__(self, style='NormalWeb') :
-		print "init"
 		#root element
 		self._para = Element().createElement('p')
 		

@@ -3,6 +3,7 @@
 import zipfile
 from lxml import etree
 from items.paragraph import Paragraph
+from items.hyperlink import Hyperlink
 
 WPREFIXES = {
         'w' : '{http://schemas.openxmlformats.org/wordprocessingml/2006/main}'
@@ -20,7 +21,7 @@ class Document :
         self._doc = zipfile.ZipFile(filename)
         #scan zipfile for header/document and footer xml files
         for path in self._doc.namelist() :
-            if path == 'word/document.xml' or 'header' in path or 'footer' in path :
+            if path == 'word/document.xml' or path == 'word/_rels/document.xml.rels' or 'header' in path or 'footer' in path :
                 self.files[path] = etree.fromstring(self._doc.read(path))
         
     #read document header as xml and returning text as list
@@ -50,8 +51,6 @@ class Document :
                     if position == 'first' : el.insert(0, paraElement)
                     else : el.append(paraElement)
 
-                print etree.tostring(paraElement, pretty_print=True)
-
     #search position of paragraph
     def _searchParagraphPosition(self, text) :
         position = 0
@@ -62,7 +61,27 @@ class Document :
                         position = position + 1
                         if text in e.text :
                             return position
+        return position
 
+    #add hyperlink to document
+    def addHyperlink(self, text, url) :
+        doc = self.files['word/document.xml']
+        for el in doc.iter() :
+            if el.tag == WPREFIXES['w'] + 'body' :
+                paragraph = Paragraph().get()
+                hyperlink = Hyperlink(text, '25').get()
+                paragraph.append(hyperlink)
+                el.append(paragraph)
+
+        #link relation
+        relations = self.files['word/_rels/document.xml.rels']
+        rel = etree.Element('Relationship')
+        rel.set('Type', 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink')
+        rel.set('Id', 'rId25')
+        rel.set('Target', url)
+        rel.set('TargetMode', 'External')
+        relations.append(rel)
+        
     #save document with new values
     def save(self, filename) :
         docxFile = zipfile.ZipFile(filename, mode='w', compression=zipfile.ZIP_DEFLATED)
@@ -81,11 +100,12 @@ class Document :
     #search and replace function
     def searchAndReplace(self, regex, replacement) :
         for key, value in self.files.items() :
-            for el in value.iter() :
-                if el.tag == WPREFIXES['w'] + 'p' :
-                    for e in el.iter() :
-                        if e.tag == WPREFIXES['w'] + 't' :
-                            e.text = e.text.replace(regex, replacement)
+            if key != 'word/_rels/document.xml.rels' :
+                for el in value.iter() :
+                    if el.tag == WPREFIXES['w'] + 'p' :
+                        for e in el.iter() :
+                            if e.tag == WPREFIXES['w'] + 't' :
+                                e.text = e.text.replace(regex, replacement)
 
     #copy function of docx
     def copyFile(self, filename) :
