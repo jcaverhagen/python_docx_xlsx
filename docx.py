@@ -65,11 +65,14 @@ class Document :
 
     #add hyperlink to document
     def addHyperlink(self, text, url) :
+
+        newRelationID = self._getHighestRelationId() + 1
+        
         doc = self.files['word/document.xml']
         for el in doc.iter() :
             if el.tag == WPREFIXES['w'] + 'body' :
                 paragraph = Paragraph().get()
-                hyperlink = Hyperlink(text, '25').get()
+                hyperlink = Hyperlink(text, str(newRelationID)).get()
                 paragraph.append(hyperlink)
                 el.append(paragraph)
 
@@ -77,11 +80,20 @@ class Document :
         relations = self.files['word/_rels/document.xml.rels']
         rel = etree.Element('Relationship')
         rel.set('Type', 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink')
-        rel.set('Id', 'rId25')
+        rel.set('Id', 'rId' + str(newRelationID))
         rel.set('Target', url)
         rel.set('TargetMode', 'External')
         relations.append(rel)
         
+    #search for highest id in relations xml
+    def _getHighestRelationId(self) :
+        highest = 0;
+        relations = self.files['word/_rels/document.xml.rels']
+        for rel in relations :
+            if int(rel.attrib['Id'].replace('rId', '')) > highest :
+                highest = int(rel.attrib['Id'].replace('rId', ''))
+        return highest
+
     #save document with new values
     def save(self, filename) :
         docxFile = zipfile.ZipFile(filename, mode='w', compression=zipfile.ZIP_DEFLATED)
