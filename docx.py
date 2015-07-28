@@ -67,24 +67,19 @@ class Document :
     def addHyperlink(self, text, url) :
 
         newRelationID = self._getHighestRelationId() + 1
-        
+        relations = self.files['word/_rels/document.xml.rels']
+
         doc = self.files['word/document.xml']
         for el in doc.iter() :
             if el.tag == WPREFIXES['w'] + 'body' :
                 paragraph = Paragraph().get()
-                hyperlink = Hyperlink(text, str(newRelationID)).get()
-                paragraph.append(hyperlink)
+                
+                hyperlink = Hyperlink(text, str(newRelationID), url)
+                paragraph.append(hyperlink.get())
+                relations.append(hyperlink.getRelation())
+
                 el.append(paragraph)
 
-        #link relation
-        relations = self.files['word/_rels/document.xml.rels']
-        rel = element.createElement('Relationship', prefix=None)
-        rel.set('Type', 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink')
-        rel.set('Id', 'rId' + str(newRelationID))
-        rel.set('Target', url)
-        rel.set('TargetMode', 'External')
-        relations.append(rel)
-        
     #search for highest id in relations xml
     def _getHighestRelationId(self) :
         highest = 0;
