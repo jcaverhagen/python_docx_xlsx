@@ -32,7 +32,7 @@ class Document :
         return self._readTextFromXML(self._body)
 
     #add paragraph as first
-    def addParagraph(self, text, position='last') :
+    def addParagraph(self, text, position='last', beforetext=None, aftertext=None) :
         doc = self.files['word/document.xml']
         for el in doc.iter() :
             if el.tag == WPREFIXES['w'] + 'body' :
@@ -40,8 +40,26 @@ class Document :
                 paragraph.setText(text)
                 paraElement = paragraph.get()
                 
-                if position == 'first' : el.insert(0, paraElement)
-                else : el.append(paraElement)
+                if aftertext or beforetext :
+                    position = self._searchParagraphPosition(aftertext)
+                    if beforetext :
+                        el.insert(position, paraElement)
+                    elif aftertext :
+                        el.insert(position + 1, paraElement)
+                else :
+                    if position == 'first' : el.insert(0, paraElement)
+                    else : el.append(paraElement)
+
+    #search position of paragraph
+    def _searchParagraphPosition(self, text) :
+        position = 0
+        for el in self.files['word/document.xml'].iter() :
+            if el.tag == WPREFIXES['w'] + 'p' :
+                for e in el.iter() :
+                    if e.tag == WPREFIXES['w'] + 't' :
+                        position = position + 1
+                        if text in e.text :
+                            return position
 
     #save document with new values
     def save(self, filename) :
@@ -86,9 +104,8 @@ class Document :
         returnList = []
         for el in xml.iter() :
             if el.tag == WPREFIXES['w'] + 'p' :
-                paraList.append(el)
                 for e in el.iter() :
-                    if e.tag == WPREFIXES['w'] + 'p' :
+                    if e.tag == WPREFIXES['w'] + 't' :
                         returnList.append(e.text)
 
         return returnList
