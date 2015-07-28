@@ -8,8 +8,8 @@ WPREFIXES = {
 
 class Element :
 
-	def createElement(self, tag, text=None, attr=None) :
-		element = etree.Element('{' + WPREFIXES['w'] + '}' + tag, nsmap=None)
+	def createElement(self, tag, text=None, attr=None, prefix='w') :
+		element = etree.Element('{' + WPREFIXES[prefix] + '}' + tag, nsmap=None)
 
 		if attr :
 			for key, value in attr.items() :
@@ -17,7 +17,7 @@ class Element :
 				if key == 'id' :
 					element.set('{' + WPREFIXES['r'] + '}' + key, value)
 				else :
-					element.set('{' + WPREFIXES['w'] + '}' + key, value)
+					element.set('{' + WPREFIXES[prefix] + '}' + key, value)
 
 		if text :
 			element.text = text

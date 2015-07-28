@@ -78,7 +78,7 @@ class Document :
 
         #link relation
         relations = self.files['word/_rels/document.xml.rels']
-        rel = etree.Element('Relationship')
+        rel = element.createElement('Relationship', prefix=None)
         rel.set('Type', 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink')
         rel.set('Id', 'rId' + str(newRelationID))
         rel.set('Target', url)
