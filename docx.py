@@ -42,14 +42,38 @@ class Document :
                 paraElement = paragraph.get()
                 
                 if aftertext or beforetext :
-                    position = self._searchParagraphPosition(aftertext)
                     if beforetext :
-                        el.insert(position, paraElement)
+                        position = self._searchParagraphPosition(beforetext)
+                        el.insert(position - 1, paraElement)
                     elif aftertext :
-                        el.insert(position + 1, paraElement)
+                        position = self._searchParagraphPosition(aftertext)
+                        el.insert(position, paraElement)
                 else :
                     if position == 'first' : el.insert(0, paraElement)
                     else : el.append(paraElement)
+
+    #add hyperlink to document
+    def addHyperlink(self, text, url, position='last', beforetext=None, aftertext=None) :
+
+        newRelationID = self._getHighestRelationId() + 1
+        relations = self.files['word/_rels/document.xml.rels']
+
+        doc = self.files['word/document.xml']
+        for el in doc.iter() :
+            if el.tag == WPREFIXES['w'] + 'body' :
+                hyperlink = Hyperlink(text, str(newRelationID), url)
+                relations.append(hyperlink.getRelation())
+
+                if aftertext or beforetext :
+                    if beforetext :
+                        position = self._searchParagraphPosition(beforetext)
+                        el.insert(position - 1, hyperlink.get())
+                    elif aftertext :
+                        position = self._searchParagraphPosition(aftertext)
+                        el.insert(position + 1, hyperlink.get())
+                else :
+                    if position == 'first' : el.insert(0, hyperlink.get())
+                    else : el.append(hyperlink.get())
 
     #search position of paragraph
     def _searchParagraphPosition(self, text) :
@@ -62,20 +86,6 @@ class Document :
                         if text in e.text :
                             return position
         return position
-
-    #add hyperlink to document
-    def addHyperlink(self, text, url) :
-
-        newRelationID = self._getHighestRelationId() + 1
-        relations = self.files['word/_rels/document.xml.rels']
-
-        doc = self.files['word/document.xml']
-        for el in doc.iter() :
-            if el.tag == WPREFIXES['w'] + 'body' :
-                hyperlink = Hyperlink(text, str(newRelationID), url)
-                relations.append(hyperlink.getRelation())
-
-                el.append(hyperlink.get())
 
     #search for highest id in relations xml
     def _getHighestRelationId(self) :
