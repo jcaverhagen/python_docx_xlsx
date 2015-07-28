@@ -10,8 +10,8 @@ class Element :
 		element = etree.Element(WPREFIXES['w'] + tag, nsmap=None)
 
 		if attr :
-			for at in attr :
-				print at
+			for key, value in attr.items() :
+				element.set(WPREFIXES['w'] + key, value)
 
 		if text :
 			element.text = text

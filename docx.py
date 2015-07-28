@@ -50,6 +50,8 @@ class Document :
                     if position == 'first' : el.insert(0, paraElement)
                     else : el.append(paraElement)
 
+                print etree.tostring(paraElement, pretty_print=True)
+
     #search position of paragraph
     def _searchParagraphPosition(self, text) :
         position = 0

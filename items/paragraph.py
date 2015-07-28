@@ -17,9 +17,20 @@ class Paragraph :
 	_run = ''
 	_textEl = ''
 
-	#TODO adding style and spacing!!!
-	def __init__(self, style='BodyText') :
+	def __init__(self, style='NormalWeb') :
+		print "init"
+		#root element
 		self._para = Element().createElement('p')
+		
+		#style element
+		pPr = Element().createElement('pPr')
+		style = Element().createElement('pStyle', attr={'val' : style})
+		spacing = Element().createElement('spacing', attr={'before' : '120', 'after' : '120'})
+		pPr.append(style)
+		pPr.append(spacing)
+		self._para.append(pPr)
+
+		#run and text element
 		self._run = Element().createElement('r')
 		self._textEl = Element().createElement('t')
 		
