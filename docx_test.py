@@ -7,6 +7,7 @@ document = Document("test.docx")
 #	print (d)
 
 #document.searchAndReplace("klaas", "jan")
-document.addParagraph("vanuit python toegevoegd")
+document.addParagraph("vanuit python toegevoegd onderaan")
+document.addParagraph("vanuit python toegevoegd bovenaan", position='first')
 
 document.save("test1.docx")

@@ -32,15 +32,16 @@ class Document :
         return self._readTextFromXML(self._body)
 
     #add paragraph as first
-    def addParagraph(self, text) :
+    def addParagraph(self, text, position='last') :
         doc = self.files['word/document.xml']
         for el in doc.iter() :
             if el.tag == WPREFIXES['w'] + 'body' :
                 paragraph = Paragraph()
                 paragraph.setText(text)
                 paraElement = paragraph.get()
-                el.append(paraElement)
-
+                
+                if position == 'first' : el.insert(0, paraElement)
+                else : el.append(paraElement)
 
     #save document with new values
     def save(self, filename) :

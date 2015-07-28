@@ -5,7 +5,7 @@ Simple docx editor written in python.
 Changelog:
 
 ##### 28-07-2015
-- Add paragraph to end of file with custom text
+- Add paragraph to end or beginning of file
 
 ##### 27-07-2015
 - Copy function
