@@ -3,6 +3,9 @@
 Simple docx editor written in python.
 
 Changelog:
+##### 29-07-2015
+- Option to add an table to end of document, create table, add rows, add to document
+
 ##### 28-07-2015
 - Method to make specific text an hyperlink
 - Function to add an hyperlink into an new paragraph with custom text as url

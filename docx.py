@@ -4,6 +4,7 @@ import zipfile
 from lxml import etree
 from items.paragraph import Paragraph
 from items.hyperlink import Hyperlink
+from items.table import Table
 
 WPREFIXES = {
         'w' : '{http://schemas.openxmlformats.org/wordprocessingml/2006/main}'
@@ -12,6 +13,7 @@ WPREFIXES = {
 class Document :
     
     _doc = ''
+    _table = ''
     files = {}
 
     def __init__(self, filename) :
@@ -61,19 +63,21 @@ class Document :
         doc = self.files['word/document.xml']
         for el in doc.iter() :
             if el.tag == WPREFIXES['w'] + 'body' :
+                paragraph = Paragraph().get()
                 hyperlink = Hyperlink(text, str(newRelationID), url)
                 relations.append(hyperlink.getRelation())
+                paragraph.append(hyperlink.get())
 
                 if aftertext or beforetext :
                     if beforetext :
                         position = self._searchParagraphPosition(beforetext)
-                        el.insert(position - 1, hyperlink.get())
+                        el.insert(position - 1, paragraph)
                     elif aftertext :
                         position = self._searchParagraphPosition(aftertext)
-                        el.insert(position + 1, hyperlink.get())
+                        el.insert(position + 1, paragraph)
                 else :
-                    if position == 'first' : el.insert(0, hyperlink.get())
-                    else : el.append(hyperlink.get())
+                    if position == 'first' : el.insert(0, paragraph)
+                    else : el.append(paragraph)
 
     #method to make specific test an hyperlink
     def makeTextHyperlink(self, text, url) :
@@ -82,9 +86,10 @@ class Document :
                 for e in el.iter() :
                     addLink = False
                     if e.tag == WPREFIXES['w'] + 't' :
-                        if text in e.text :
-                            e.text = e.text.replace(text, '')
-                            addLink = True
+                        if e.text :
+                            if text in e.text :
+                                e.text = e.text.replace(text, '')
+                                addLink = True
                     if addLink :
                         newRelationID = self._getHighestRelationId() + 1
                         relations = self.files['word/_rels/document.xml.rels']
@@ -101,8 +106,9 @@ class Document :
                 for e in el.iter() :
                     if e.tag == WPREFIXES['w'] + 't' :
                         position = position + 1
-                        if text in e.text :
-                            return position
+                        if e.text :
+                            if text in e.text :
+                                return position
         return position
 
     #search for highest id in relations xml
@@ -113,6 +119,18 @@ class Document :
             if int(rel.attrib['Id'].replace('rId', '')) > highest :
                 highest = int(rel.attrib['Id'].replace('rId', ''))
         return highest
+
+    def addTable(self, width, columns) :
+        self._table = Table(width, columns)
+
+    def addRow(self, val) :
+        self._table.addRow(val)
+
+    def addTableToDoc(self) :
+        doc = self.files['word/document.xml']
+        for el in doc.iter() :
+            if el.tag == WPREFIXES['w'] + 'body' :
+                el.append(self._table.get())
 
     #save document with new values
     def save(self, filename) :
