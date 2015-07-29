@@ -14,7 +14,6 @@ WPREFIXES = {
 class Document :
     
     _doc = ''
-    _table = ''
     files = {}
 
     def __init__(self, filename) :
