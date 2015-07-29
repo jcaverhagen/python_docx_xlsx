@@ -35,7 +35,7 @@ class Document :
         return self._readTextFromXML(self._body)
 
     #add paragraph as first
-    def addParagraph(self, text, position='last', beforetext=None, aftertext=None) :
+    def addParagraph(self, text, position='last') :
         doc = self.files['word/document.xml']
         for el in doc.iter() :
             if el.tag == WPREFIXES['w'] + 'body' :
@@ -43,19 +43,10 @@ class Document :
                 paragraph.setText(text)
                 paraElement = paragraph.get()
                 
-                if aftertext or beforetext :
-                    if beforetext :
-                        position = self._searchParagraphPosition(beforetext)
-                        el.insert(position - 1, paraElement)
-                    elif aftertext :
-                        position = self._searchParagraphPosition(aftertext)
-                        el.insert(position, paraElement)
-                else :
-                    if position == 'first' : el.insert(0, paraElement)
-                    else : el.append(paraElement)
+                self._addToDoc(paraElement, position)
 
     #add hyperlink to document
-    def addHyperlink(self, text, url, position='last', beforetext=None, aftertext=None) :
+    def addHyperlink(self, text, url, position='last') :
 
         newRelationID = self._getHighestRelationId() + 1
         relations = self.files['word/_rels/document.xml.rels']
@@ -68,16 +59,7 @@ class Document :
                 relations.append(hyperlink.getRelation())
                 paragraph.append(hyperlink.get())
 
-                if aftertext or beforetext :
-                    if beforetext :
-                        position = self._searchParagraphPosition(beforetext)
-                        el.insert(position - 1, paragraph)
-                    elif aftertext :
-                        position = self._searchParagraphPosition(aftertext)
-                        el.insert(position + 1, paragraph)
-                else :
-                    if position == 'first' : el.insert(0, paragraph)
-                    else : el.append(paragraph)
+                self._addToDoc(paragraph, position)
 
     #method to make specific test an hyperlink
     def makeTextHyperlink(self, text, url) :
@@ -98,19 +80,6 @@ class Document :
                         relations.append(hyperlink.getRelation())
                         el.append(hyperlink.get())
 
-    #search position of paragraph
-    def _searchParagraphPosition(self, text) :
-        position = 0
-        for el in self.files['word/document.xml'].iter() :
-            if el.tag == WPREFIXES['w'] + 'p' :
-                for e in el.iter() :
-                    if e.tag == WPREFIXES['w'] + 't' :
-                        position = position + 1
-                        if e.text :
-                            if text in e.text :
-                                return position
-        return position
-
     #search for highest id in relations xml
     def _getHighestRelationId(self) :
         highest = 0;
@@ -126,11 +95,38 @@ class Document :
     def addRow(self, val) :
         self._table.addRow(val)
 
-    def addTableToDoc(self) :
+    def addTableToDoc(self, position='last') :
+        self._addToDoc(self._table.get(), position)
+
+    #method to add element to document file
+    def _addToDoc(self, element, position='last') :
         doc = self.files['word/document.xml']
         for el in doc.iter() :
             if el.tag == WPREFIXES['w'] + 'body' :
-                el.append(self._table.get())
+                if position == 'first' : el.insert(0, element)
+                else : 
+                    if 'aftertext:' in position :
+                        position = self._searchParagraphPosition(position.replace('aftertext:', ''))
+                        el.insert(position, element)    
+                    elif 'beforetext:' in position :
+                        position = self._searchParagraphPosition(position.replace('beforetext:', ''))
+                        el.insert(position-1, element)
+                    else :
+                        el.append(element)
+                    
+
+    #search position of paragraph
+    def _searchParagraphPosition(self, text) :
+        position = 0
+        for el in self.files['word/document.xml'].iter() :
+            if el.tag == WPREFIXES['w'] + 'p' :
+                for e in el.iter() :
+                    if e.tag == WPREFIXES['w'] + 't' :
+                        position = position + 1
+                        if e.text :
+                            if text in e.text :
+                                return position
+        return position
 
     #save document with new values
     def save(self, filename) :
