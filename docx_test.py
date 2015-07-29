@@ -1,3 +1,4 @@
+import items.styles
 from docx import Document
 
 document = Document("test.docx")
@@ -19,18 +20,18 @@ document.addHyperlink("link after test", "http://www.google.nl", 'aftertext:Test
 document.makeTextHyperlink("klaas", "http://www.klaas.nl")
 
 #add table with 3 columns
-document.addTable(5000, 3)
-document.addRow({'test1', 'test2', 'test3'})
-document.addRow({'test4', 'test5', 'test6'})
-document.addRow({'test7', 'test8', 'test9'})
-document.addTableToDoc()
+table = document.addTable(5000, 3)
+table.addRow({'test1', 'test2', 'test3'})
+table.addRow({'test4', 'test5', 'test6'})
+table.addRow({'test7', 'test8', 'test9'})
+document.closeTable(table)
 
 #add table with 2 columns at top
-document.addTable(5000, 2)
-document.addRow({'test1', 'test2'})
-document.addRow({'test4', 'test5'})
-document.addRow({'test7', 'test8'})
-document.addTableToDoc('first')
+table = document.addTable(5000, 2)
+table.addRow({'test1', 'test2'})
+table.addRow({'test4', 'test5'})
+table.addRow({'test7', 'test8'})
+document.closeTable(table, position='first')
 
 #list
 listItem = document.addList('first', type='bullet')

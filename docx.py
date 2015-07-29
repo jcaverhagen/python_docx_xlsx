@@ -46,6 +46,8 @@ class Document :
                 
                 self._addToDoc(paraElement, position)
 
+        return paragraph
+
     #add hyperlink to document
     def addHyperlink(self, text, url, position='last') :
 
@@ -90,14 +92,13 @@ class Document :
                 highest = int(rel.attrib['Id'].replace('rId', ''))
         return highest
 
+    #init an new table and returning it to caller
     def addTable(self, width, columns) :
-        self._table = Table(width, columns)
+        return Table(width, columns)
 
-    def addRow(self, val) :
-        self._table.addRow(val)
-
-    def addTableToDoc(self, position='last') :
-        self._addToDoc(self._table.get(), position)
+    #close table and add it to document
+    def closeTable(self, table, position='last') :
+        self._addToDoc(table.get(), position)
 
     #init an new list and return object to caller
     def addList(self, position, type) :
