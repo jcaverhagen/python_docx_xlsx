@@ -4,6 +4,7 @@ Simple docx editor written in python.
 
 Changelog:
 ##### 29-07-2015
+- Added type of list, choose between numeric list or bullets
 - Option to add list to custom position in document, first/last/aftertext/beforetext.
 - Implemented numeric list to end of document
 - Universal method to add element to document with position (first, last, aftertext, beforetext)

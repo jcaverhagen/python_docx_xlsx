@@ -33,7 +33,7 @@ document.addRow({'test7', 'test8'})
 document.addTableToDoc('first')
 
 #list
-listItem = document.addList('aftertext:Test')
+listItem = document.addList('first', type='bullet')
 listItem.addItem('piet')
 listItem.addItem('henk')
 listItem.addItem('Jan')

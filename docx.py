@@ -100,8 +100,8 @@ class Document :
         self._addToDoc(self._table.get(), position)
 
     #init an new list and return object to caller
-    def addList(self, position) :
-        listItem = List(position)
+    def addList(self, position, type) :
+        listItem = List(position, type)
         return listItem
 
     #close list and inserting it in document
