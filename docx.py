@@ -5,6 +5,7 @@ from lxml import etree
 from items.paragraph import Paragraph
 from items.hyperlink import Hyperlink
 from items.table import Table
+from items.list import List
 
 WPREFIXES = {
         'w' : '{http://schemas.openxmlformats.org/wordprocessingml/2006/main}'
@@ -97,6 +98,15 @@ class Document :
 
     def addTableToDoc(self, position='last') :
         self._addToDoc(self._table.get(), position)
+
+    def addList(self) :
+        listItem = List()
+        return listItem
+
+    def closeList(self, listItem) :
+        listItems = listItem.get()
+        for item in listItems :
+            self._addToDoc(item)
 
     #method to add element to document file
     def _addToDoc(self, element, position='last') :

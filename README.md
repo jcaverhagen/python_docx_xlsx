@@ -4,6 +4,7 @@ Simple docx editor written in python.
 
 Changelog:
 ##### 29-07-2015
+- Implemented numeric list to end of document
 - Universal method to add element to document with position (first, last, aftertext, beforetext)
 - Option to add an table to end of document, create table, add rows, add to document
 
