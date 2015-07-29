@@ -33,9 +33,12 @@ document.addRow({'test7', 'test8'})
 document.addTableToDoc('first')
 
 #list
-listItem = document.addList()
+listItem = document.addList('aftertext:Test')
 listItem.addItem('piet')
 listItem.addItem('henk')
+listItem.addItem('Jan')
+listItem.addItem('Frits')
+listItem.addItem('Bert')
 document.closeList(listItem)
 
 document.save("test1.docx")

@@ -99,14 +99,22 @@ class Document :
     def addTableToDoc(self, position='last') :
         self._addToDoc(self._table.get(), position)
 
-    def addList(self) :
-        listItem = List()
+    #init an new list and return object to caller
+    def addList(self, position) :
+        listItem = List(position)
         return listItem
 
+    #close list and inserting it in document
     def closeList(self, listItem) :
+        position = listItem.getPosition()
         listItems = listItem.get()
-        for item in listItems :
-            self._addToDoc(item)
+        
+        if position == 'last' :
+             for item in listItems :
+                self._addToDoc(item, position)
+        else :
+            for item in reversed(listItems) :
+                self._addToDoc(item, position)
 
     #method to add element to document file
     def _addToDoc(self, element, position='last') :
