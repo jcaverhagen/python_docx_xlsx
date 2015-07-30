@@ -3,12 +3,12 @@ from docx import Document
 
 document = Document("test.docx")
 
+"""
 #search and replace
 document.searchAndReplace("klaas", "jan")
 
 #add paragraph
 document.addParagraph("vanuit python toegevoegd onderaan")
-document.addParagraph("vanuit python toegevoegd bovenaan", 'first')
 document.addParagraph("vanuit python toegevoegd na klaas", 'aftertext:klaas')
 
 #add hyperlink
@@ -41,5 +41,9 @@ listItem.addItem('Jan')
 listItem.addItem('Frits')
 listItem.addItem('Bert')
 document.closeList(listItem)
+"""
+
+#add heading
+document.addParagraph("HEADING 1", 'first', 'Heading1')
 
 document.save("test1.docx")

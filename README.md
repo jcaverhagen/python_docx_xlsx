@@ -3,6 +3,9 @@
 Simple docx editor written in python.
 
 Changelog:
+##### 30-07-2015
+- Added option to give an Heading with an paragraph, implemented heading 1 to 5
+
 ##### 29-07-2015
 - Code improvement
 - Added type of list, choose between numeric list or bullets

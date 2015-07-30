@@ -3,7 +3,7 @@ from element import Element
 
 _basic = """<w:p>
 				<w:pPr>
-					<w:pStyle> w:val="NormalWeb"/>
+					<w:pStyle w:val="NormalWeb"/>
 					<w:spacing w:before="120" w:after="120"/>
 				</w:pPr>
 				<w:r>
@@ -24,9 +24,9 @@ class Paragraph :
 		#style element
 		pPr = Element().createElement('pPr')
 		style = Element().createElement('pStyle', attr={'val' : style})
-		spacing = Element().createElement('spacing', attr={'before' : '120', 'after' : '120'})
+		#spacing = Element().createElement('spacing', attr={'before' : '120', 'after' : '120'})
+		#pPr.append(spacing)
 		pPr.append(style)
-		pPr.append(spacing)
 		self._para.append(pPr)
 
 		#run and text element

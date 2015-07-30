@@ -1,11 +1,11 @@
 #!/usr/bin/python
-
 import zipfile
 from lxml import etree
 from items.paragraph import Paragraph
 from items.hyperlink import Hyperlink
 from items.table import Table
 from items.list import List
+from items.files import StyleFile
 
 WPREFIXES = {
         'w' : '{http://schemas.openxmlformats.org/wordprocessingml/2006/main}'
@@ -35,11 +35,11 @@ class Document :
         return self._readTextFromXML(self._body)
 
     #add paragraph as first
-    def addParagraph(self, text, position='last') :
+    def addParagraph(self, text, position='last', style='NormalWeb') :
         doc = self.files['word/document.xml']
         for el in doc.iter() :
             if el.tag == WPREFIXES['w'] + 'body' :
-                paragraph = Paragraph()
+                paragraph = Paragraph(style)
                 paragraph.setText(text)
                 paraElement = paragraph.get()
                 
@@ -153,7 +153,10 @@ class Document :
         #copy from old docx every file except the files that are in files list
         for path in self._doc.namelist() :
             if path not in self.files :
-                docxFile = self.copyToXML(docxFile, path)
+                if path == 'word/styles.xml' :
+                    styleFile = etree.fromstring(StyleFile().getStyleFile())
+                    docxFile.writestr('word/styles.xml', etree.tostring(styleFile, pretty_print=True))
+                else : docxFile = self.copyToXML(docxFile, path)
 
         #add files from file list to docx
         for key, value in self.files.items() :

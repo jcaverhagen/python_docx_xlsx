@@ -46,7 +46,7 @@ class List :
 		pPr.append(ind)
 
 		levels	= Element().createElement('ilvl', attr={'val' : '0'})
-		numId	= Element().createElement('numId', attr={'val' : 'self._type'})
+		numId	= Element().createElement('numId', attr={'val' : self._type})
 		numPr.append(levels)
 		numPr.append(numId)
 
