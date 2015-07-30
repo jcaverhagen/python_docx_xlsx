@@ -50,8 +50,11 @@ class Table :
 
 	_table = ''
 	_columnWidth = ''
+	_position = ''
 
-	def __init__(self, width, columns=1, style='TableGrid') :
+	def __init__(self, width, columns=1, style='TableGrid', position='last') :
+		self._position = position
+
 		self._table = Element().createElement('tbl')
 		tblPr = Element().createElement('tblPr')
 		style = Element().createElement('tblStyle', attr={'val' : style})
@@ -89,6 +92,9 @@ class Table :
 
 	def get(self) :
 		return self._table
+
+	def getPosition(self) :
+		return self._position
 
 	def _getNewRow(self) :
 		return Element().createElement('tr')

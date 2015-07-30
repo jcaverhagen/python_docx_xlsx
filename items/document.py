@@ -1,4 +1,12 @@
 from datetime import datetime
+from element import Element
+from lxml import etree
+
+WPREFIXES = {
+        'w' : '{http://schemas.openxmlformats.org/wordprocessingml/2006/main}',
+    	#relationships
+	    'r':  'http://schemas.openxmlformats.org/officeDocument/2006/relationships'
+    }
 
 class RelationshipFile() :
 
@@ -17,20 +25,42 @@ class RelationshipFile() :
 
 class DocumentRelationshipFile() :
 
-	path = 'word/rels/document.xml.rels'
+	path = 'word/_rels/document.xml.rels'
+	_rels = ''
 
-	def __init__(self) :
-		self.xmlString = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-			<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
-			<Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/webSettings" Target="webSettings.xml"/>
-			<Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/settings" Target="settings.xml"/>
-			<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>
-			<Relationship Id="rId5" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/theme" Target="theme/theme1.xml"/>
-			<Relationship Id="rId4" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/fontTable" Target="fontTable.xml"/>
-			</Relationships>"""
+	def __init__(self, xml=None) :
+		if xml is not None :
+			self._rels = xml
+		else :
+			self._rels = etree.fromstring("""<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+				<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+				<Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/webSettings" Target="webSettings.xml"/>
+				<Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/settings" Target="settings.xml"/>
+				<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>
+				<Relationship Id="rId5" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/theme" Target="theme/theme1.xml"/>
+				<Relationship Id="rId4" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/fontTable" Target="fontTable.xml"/>
+				</Relationships>""")
+
+	def addRelation(self, type, url=None) :
+		if type == 'hyperlink' :
+			new_id = self._getHighestRelationId() + 1
+			attr = {'Id' : 'rId' + str(new_id), 'Type' : WPREFIXES['r'] + '/hyperlink', 'Target' : url, 'TargetMode' : 'External'}
+			rel = Element().createElement('Relationship', prefix=None, attr=attr)
+			self._rels.append(rel)
+			
+			return new_id
+
+	#search for highest id in relations xml
+	def _getHighestRelationId(self) :
+		highest = 0
+		for rel in self._rels :
+			if int(rel.attrib['Id'].replace('rId', '')) > highest :
+				highest = int(rel.attrib['Id'].replace('rId', ''))
+
+		return highest
 
 	def getXml(self) :
-		return self.xmlString
+		return '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' + etree.tostring(self._rels, pretty_print=True)
 
 class AppFile :
 
@@ -88,17 +118,69 @@ class CoreFile :
 class DocumentFile :
 
 	path = 'word/document.xml'
-	content = ''
+	_doc = ''
 
-	def __init__(self) :
-		self.xmlString = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-			<w:document xmlns:ve="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" xmlns:w10="urn:schemas-microsoft-com:office:word" xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:wne="http://schemas.microsoft.com/office/word/2006/wordml">
-			<w:body>
-			</w:body>
-			</w:document>"""
+	def __init__(self, xml=None) :
+		if xml is not None :
+			self._doc = xml
+		else :
+			self._doc = etree.fromstring("""<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+				<w:document xmlns:ve="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" xmlns:w10="urn:schemas-microsoft-com:office:word" xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:wne="http://schemas.microsoft.com/office/word/2006/wordml">
+				<w:body>
+				</w:body>
+				</w:document>""")
+
+	#adding an element to document.xml
+	def addElement(self, element, position='last') :
+		for el in self._doc.iter() :
+			if el.tag == WPREFIXES['w'] + 'body' :
+				if position == 'first' : el.insert(0, element)
+				else :
+					if 'beforetext:' in position :
+						position = self._searchParagraphPosition(position.replace('aftertext:', ''))
+						el.insert(position-1, element)
+					elif 'aftertext:' in position :
+						position = self._searchParagraphPosition(position.replace('aftertext:', ''))
+						el.insert(position, element)
+					else :
+						el.append(element)
+
+	def makeTextHyperlink(self, text, element) :
+		for el in self._doc.iter() :
+			if el.tag == WPREFIXES['w'] + 'p' :
+				for e in el.iter() :
+					addLink = False
+					if e.tag == WPREFIXES['w'] + 't' :
+						if e.text :
+							if text in e.text :
+								e.text = e.text.replace(text, ' ')
+								addLink = True
+
+					if addLink :
+						el.append(element)
+
+	def searchAndReplace(self, regex, replacement) :
+		for el in self._doc.iter() :
+			if el.tag == WPREFIXES['w'] + 'p' :
+				for e in el.iter() :
+					if e.tag == WPREFIXES['w'] + 't' :
+						e.text = e.text.replace(regex, replacement)
+
+	#search position of paragraph
+	def _searchParagraphPosition(self, text):
+		position = 0
+		for el in self._doc.iter() :
+			if el.tag == WPREFIXES['w'] + 'p' :
+				for e in el.iter() :
+					if e.tag == WPREFIXES['w'] + 't' :
+						position = position + 1
+						if e.text :
+							if text in e.text :
+								return position
+		return position
 
 	def getXml(self) :
-		return self.xmlString
+		return etree.tostring(self._doc, pretty_print=True)
 
 class ContentTypeFile() :
 
@@ -592,6 +674,54 @@ class StyleFile :
 			<w:rFonts w:asciiTheme="majorHAnsi" w:eastAsiaTheme="majorEastAsia" w:hAnsiTheme="majorHAnsi" w:cstheme="majorBidi"/>
 			<w:color w:val="243F60" w:themeColor="accent1" w:themeShade="7F"/>
 			</w:rPr>
+			</w:style>
+			<w:style w:type="character" w:styleId="Hyperlink">
+			<w:name w:val="Hyperlink"/>
+			<w:basedOn w:val="DefaultParagraphFont"/>
+			<w:uiPriority w:val="99"/>
+			<w:unhideWhenUsed/>
+			<w:rsid w:val="00ED0E71"/>
+			<w:rPr>
+			<w:color w:val="0000FF" w:themeColor="hyperlink"/>
+			<w:u w:val="single"/>
+			</w:rPr>
+			</w:style>
+			<w:style w:type="table" w:styleId="TableGrid">
+			<w:name w:val="Table Grid"/>
+			<w:basedOn w:val="TableNormal"/>
+			<w:uiPriority w:val="59"/>
+			<w:rsid w:val="007808D7"/>
+			<w:pPr>
+			<w:spacing w:after="0" w:line="240" w:lineRule="auto"/>
+			</w:pPr>
+			<w:tblPr>
+			<w:tblInd w:w="0" w:type="dxa"/>
+			<w:tblBorders>
+			<w:top w:val="single" w:sz="4" w:space="0" w:color="auto"/>
+			<w:left w:val="single" w:sz="4" w:space="0" w:color="auto"/>
+			<w:bottom w:val="single" w:sz="4" w:space="0" w:color="auto"/>
+			<w:right w:val="single" w:sz="4" w:space="0" w:color="auto"/>
+			<w:insideH w:val="single" w:sz="4" w:space="0" w:color="auto"/>
+			<w:insideV w:val="single" w:sz="4" w:space="0" w:color="auto"/>
+			</w:tblBorders>
+			<w:tblCellMar>
+			<w:top w:w="0" w:type="dxa"/>
+			<w:left w:w="108" w:type="dxa"/>
+			<w:bottom w:w="0" w:type="dxa"/>
+			<w:right w:w="108" w:type="dxa"/>
+			</w:tblCellMar>
+			</w:tblPr>
+			</w:style>
+			<w:style w:type="paragraph" w:styleId="ListParagraph">
+			<w:name w:val="List Paragraph"/>
+			<w:basedOn w:val="Normal"/>
+			<w:uiPriority w:val="34"/>
+			<w:qFormat/>
+			<w:rsid w:val="001B5762"/>
+			<w:pPr>
+			<w:ind w:left="720"/>
+			<w:contextualSpacing/>
+			</w:pPr>
 			</w:style>
 			</w:styles>"""
 
