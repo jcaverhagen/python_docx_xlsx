@@ -6,7 +6,8 @@ from items.hyperlink import Hyperlink
 from items.table import Table
 from items.list import List
 from items.document import (
- StyleFile, AppFile, RelationshipFile, DocumentRelationshipFile, CoreFile, DocumentFile, ContentTypeFile, SettingsFile, FontTableFile, WebSettingsFile, ThemeFile
+ StyleFile, AppFile, RelationshipFile, DocumentRelationshipFile, CoreFile, DocumentFile, 
+ ContentTypeFile, SettingsFile, FontTableFile, WebSettingsFile, ThemeFile
 )
 
 WPREFIXES = {

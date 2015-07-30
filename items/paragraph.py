@@ -1,5 +1,6 @@
 from lxml import etree
 from element import Element
+from colors import Colors
 
 _basic = """<w:p>
 				<w:pPr>
@@ -35,13 +36,19 @@ class Paragraph :
 		if italic is not False :
 			self._prop.append(Element().createElement('i', attr={'val' : 'true'}))
 		if underline is not False :
-			if underline == True :
-				underline = '#000000'
-			self._prop.append(Element().createElement('u', attr={'val' : 'single', 'color' : underline.replace('#', '')}))
+			if underline in Colors().colors :
+				self._prop.append(Element().createElement('u', attr={'val' : 'single', 'color' : Colors().colors[color].replace('#', '')}))
+			else :
+				if underline == True :
+					underline = '#000000'
+				self._prop.append(Element().createElement('u', attr={'val' : 'single', 'color' : underline.replace('#', '')}))
 		if uppercase is not False :
 			self._prop.append(Element().createElement('caps', attr={'val' : 'true'}))
 		if color is not False :
-			self._prop.append(Element().createElement('color', attr={'val' : color.replace('#', '')}))
+			if color in Colors().colors :
+				self._prop.append(Element().createElement('color', attr={'val' : Colors().colors[color].replace('#', '')}))
+			else :
+				self._prop.append(Element().createElement('color', attr={'val' : color.replace('#', '')}))
 		if font is not False :
 			self._prop.append(Element().createElement('rFonts', attr={'ascii' : font, 'hAnsi' : font}))
 

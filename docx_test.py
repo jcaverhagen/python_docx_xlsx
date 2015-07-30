@@ -33,8 +33,8 @@ NEW DOCUMENT WITH NO INPUT FILE, CREATING FROM SCRATCH
 #creating complete file
 document = Document()
 #paragraph
-document.addParagraph("vanuit python toegevoegd onderaan", bold=True, italic=True, underline='#008000', 
-					uppercase=True, color='#008000', font='Times New Roman')
+document.addParagraph("vanuit python toegevoegd onderaan", bold=True, italic=True, underline='red', 
+					uppercase=True, color='red', font='Times New Roman')
 document.addParagraph("vanuit python toegevoegd na klaas", 'aftertext:klaas')
 #search and replace
 document.searchAndReplace("klaas", "jan")

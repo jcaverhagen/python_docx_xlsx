@@ -4,6 +4,7 @@ Simple docx editor written in python.
 
 Changelog:
 ##### 30-07-2015
+- Added primary colors for font color and underline color
 - Implemented style for paragraph, bold, italic, underline, uppercase, color and font
 - Refactoring bunch of code, improvements and working with file and creating from scratch
 - Option to create an empty word document from scratch with default settings
