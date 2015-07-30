@@ -60,7 +60,7 @@ class DocumentRelationshipFile() :
 		return highest
 
 	def getXml(self) :
-		return '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' + etree.tostring(self._rels, pretty_print=True)
+		return etree.tostring(self._rels, pretty_print=True)
 
 class AppFile :
 

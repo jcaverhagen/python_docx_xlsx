@@ -13,30 +13,42 @@ _basic = """<w:p>
 
 class Paragraph :
 	
-	_para = ''
-	_run = ''
-	_textEl = ''
-
-	def __init__(self, style='NormalWeb') :
+	_prop = ''
+	
+	def __init__(self, text='', style='NormalWeb', bold=False, italic=False, underline=False, 
+					uppercase=False, color=False, font=False) :
 		#root element
-		self._para = Element().createElement('p')
+		self.para = Element().createElement('p')
 		
 		#style element
 		pPr = Element().createElement('pPr')
-		style = Element().createElement('pStyle', attr={'val' : style})
-		#spacing = Element().createElement('spacing', attr={'before' : '120', 'after' : '120'})
-		#pPr.append(spacing)
-		pPr.append(style)
-		self._para.append(pPr)
+		self.para.append(pPr)
+		pPr.append(Element().createElement('pStyle', attr={'val' : style}))
 
 		#run and text element
-		self._run = Element().createElement('r')
-		self._textEl = Element().createElement('t')
+		run = Element().createElement('r')
+		self._prop = Element().createElement('rPr')
+		run.append(self._prop)
 		
-	def setText(self, text) :
-		self._textEl.text = text
+		if bold is not False :
+			self._prop.append(Element().createElement('b', attr={'val' : 'true'}))
+		if italic is not False :
+			self._prop.append(Element().createElement('i', attr={'val' : 'true'}))
+		if underline is not False :
+			if underline == True :
+				underline = '#000000'
+			self._prop.append(Element().createElement('u', attr={'val' : 'single', 'color' : underline.replace('#', '')}))
+		if uppercase is not False :
+			self._prop.append(Element().createElement('caps', attr={'val' : 'true'}))
+		if color is not False :
+			self._prop.append(Element().createElement('color', attr={'val' : color.replace('#', '')}))
+		if font is not False :
+			self._prop.append(Element().createElement('rFonts', attr={'ascii' : font, 'hAnsi' : font}))
 
+		textEl = Element().createElement('t')
+		textEl.text = text
+		run.append(textEl)
+		self.para.append(run)
+	
 	def get(self) :
-		self._run.append(self._textEl)
-		self._para.append(self._run)
-		return self._para
+		return self.para

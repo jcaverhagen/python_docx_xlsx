@@ -1,10 +1,6 @@
 import items.styles
 from docx import Document
 
-
-#add heading
-#document.addParagraph("HEADING 1", 'first', 'Heading1')
-
 """
 DOCUMENT WITH INPUT FILE
 """
@@ -37,7 +33,8 @@ NEW DOCUMENT WITH NO INPUT FILE, CREATING FROM SCRATCH
 #creating complete file
 document = Document()
 #paragraph
-document.addParagraph("vanuit python toegevoegd onderaan")
+document.addParagraph("vanuit python toegevoegd onderaan", bold=True, italic=True, underline='#008000', 
+					uppercase=True, color='#008000', font='Times New Roman')
 document.addParagraph("vanuit python toegevoegd na klaas", 'aftertext:klaas')
 #search and replace
 document.searchAndReplace("klaas", "jan")
@@ -69,5 +66,8 @@ listItem.addItem('Jan')
 listItem.addItem('Frits')
 listItem.addItem('Bert')
 document.closeList(listItem)
+
+#add heading
+document.addParagraph("This file is created through python for testing", 'first', 'Heading1', bold=True)
 
 document.save("test2.docx")

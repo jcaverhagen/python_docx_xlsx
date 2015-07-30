@@ -45,13 +45,11 @@ class Document :
         return self._readTextFromXML(self._body)
 
     #add paragraph as first
-    def addParagraph(self, text, position='last', style='NormalWeb') :
+    def addParagraph(self, text, position='last', style='NormalWeb', bold=False, italic=False, 
+                        underline=False, uppercase=False, color=False, font=False) :
         doc = self.files['word/document.xml']
-        paragraph = Paragraph(style)
-        paragraph.setText(text)
-        paraElement = paragraph.get()
-
-        doc.addElement(paraElement, position)
+        paragraph = Paragraph(text, style, bold, italic, underline, uppercase, color, font).get()
+        doc.addElement(paragraph, position)
 
     #add hyperlink to document
     def addHyperlink(self, text, url, position='last') :
