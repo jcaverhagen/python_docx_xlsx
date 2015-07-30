@@ -1,10 +1,46 @@
 from datetime import datetime
 
-class AppFile :
+class RelationshipFile() :
+
+	path = '_rels/.rels'
 
 	def __init__(self) :
-		self.dirName = 'docProps'
-		self.fileName = 'app.xml'
+		self.xmlString = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+			<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+			<Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/extended-properties" Target="docProps/app.xml"/>
+			<Relationship Id="rId2" Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties" Target="docProps/core.xml"/>
+			<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>
+			</Relationships>"""
+
+	def getXml(self) :
+		return self.xmlString
+
+class DocumentRelationshipFile() :
+
+	path = 'word/rels/document.xml.rels'
+
+	def __init__(self) :
+		self.xmlString = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+			<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+			<Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/webSettings" Target="webSettings.xml"/>
+			<Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/settings" Target="settings.xml"/>
+			<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>
+			<Relationship Id="rId5" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/theme" Target="theme/theme1.xml"/>
+			<Relationship Id="rId4" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/fontTable" Target="fontTable.xml"/>
+			</Relationships>"""
+
+	def getXml(self) :
+		return self.xmlString
+
+class AppFile :
+
+	path = 'docProps/app.xml'
+	props = {}
+
+	def __init__(self) :
+
+		self.props['company'] = ''
+
 		self.xmlString = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 			<Properties xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties" xmlns:vt="http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes">
 			<Template>Normal</Template>
@@ -17,7 +53,7 @@ class AppFile :
 			<Lines>1</Lines>
 			<Paragraphs>1</Paragraphs>
 			<ScaleCrop>false</ScaleCrop>
-			<Company>Topic Embedded Systems</Company>
+			<Company>{company}</Company>
 			<LinksUpToDate>false</LinksUpToDate>
 			<CharactersWithSpaces>0</CharactersWithSpaces>
 			<SharedDoc>false</SharedDoc>
@@ -25,32 +61,16 @@ class AppFile :
 			<AppVersion>12.0000</AppVersion>
 			</Properties>"""
 
-	def getAppFile(self) :
-		return self.xmlString
-
-class RelationshipFile() :
-
-	def __init__(self) :
-		self.dirName = 'word/rels'
-		self.fileName = 'document.xml.rels'
-		self.xmlString = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-			<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
-			<Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/webSettings" Target="webSettings.xml"/>
-			<Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/settings" Target="settings.xml"/>
-			<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>
-			<Relationship Id="rId5" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/theme" Target="theme/theme1.xml"/>
-			<Relationship Id="rId4" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/fontTable" Target="fontTable.xml"/>
-			</Relationships>"""
-
-	def getRelationshipFile(self) :
-		return self.xmlString
+	def getXml(self) :
+		return self.xmlString.format(company=self.props.get('company', ''))
 
 class CoreFile :
 
+	path = 'docProps/core.xml'
+	props = {}
+
 	def __init__(self) :
-		self.dirName = 'docProps'
-		self.fileName = 'core.xml'
-		self.props = {'creator' : 'DAVOB'}
+		self.props['creator'] = ''
 		self.xmlString = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 			<cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dcmitype="http://purl.org/dc/dcmitype/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 			<dc:creator>{creator}</dc:creator>
@@ -60,30 +80,31 @@ class CoreFile :
 			<dcterms:modified xsi:type="dcterms:W3CDTF">{created}</dcterms:modified>
 			</cp:coreProperties>"""
 
-	def getCoreFile(self) :
+	def getXml(self) :
 		created = datetime.strftime(datetime.today(), '%Y-%m-%dT%H:%M:%SZ')
 		return self.xmlString.format(creator=self.props.get('creator', ''),
 									created=created)
 
 class DocumentFile :
 
+	path = 'word/document.xml'
+	content = ''
+
 	def __init__(self) :
-		self.dirName = 'word'
-		self.fileName = 'document.xml'
 		self.xmlString = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 			<w:document xmlns:ve="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" xmlns:w10="urn:schemas-microsoft-com:office:word" xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:wne="http://schemas.microsoft.com/office/word/2006/wordml">
 			<w:body>
 			</w:body>
 			</w:document>"""
 
-	def getDocumentFile(self) :
+	def getXml(self) :
 		return self.xmlString
 
 class ContentTypeFile() :
 
+	path = '[Content_Types].xml'
+
 	def __init__(self) :
-		self.dirName = ''
-		self.fileName = '[Content_Types].xml'
 		self.xmlString = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 			<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
 			<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
@@ -102,14 +123,14 @@ class ContentTypeFile() :
 			<Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/>
 			</Types>"""
 
-	def getContentTypeFile(self) :
+	def getXml(self) :
 		return self.xmlString
 
 class SettingsFile() :
 
+	path = 'word/settings.xml'
+
 	def __init__(self) :
-		self.dirName = 'word'
-		self.fileName = 'settings.xml'
 		self.xmlString = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 			<w:settings xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w10="urn:schemas-microsoft-com:office:word" xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:sl="http://schemas.openxmlformats.org/schemaLibrary/2006/main">
 			<w:zoom w:percent="100"/>
@@ -147,14 +168,14 @@ class SettingsFile() :
 			<w:listSeparator w:val=";"/>
 			</w:settings>"""
 
-	def getSettingsFile(self) :
+	def getXml(self) :
 		return self.xmlString
 
 class FontTableFile() :
 
+	path = 'word/fontTable.xml'
+
 	def __init__(self) :
-		self.dirName = 'word'
-		self.fileName = 'fontTable.xml'
 		self.xmlString = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 			<w:fonts xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
 			<w:font w:name="Calibri">
@@ -180,27 +201,27 @@ class FontTableFile() :
 			</w:font>
 			</w:fonts>"""
 
-	def getFontTableFile(self) :
+	def getXml(self) :
 		return self.xmlString
 
 class WebSettingsFile() :
 
+	path = 'word/webSettings.xml'
+
 	def __init__(self) :
-		self.dirName = 'word'
-		self.fileName = 'webSettings.xml'
 		self.xmlString = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 			<w:webSettings xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
 			<w:optimizeForBrowser/>
 			</w:webSettings>"""
 
-	def getWebSettingsFile(self) :
+	def getXml(self) :
 		return self.xmlString
 
 class StyleFile :
 
+	path = 'word/styles.xml'
+
 	def __init__(self) :
-		self.dirName = 'word'
-		self.fileName = 'styles.xml'
 		self.xmlString = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 			<w:styles xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
 			<w:docDefaults>
@@ -574,14 +595,14 @@ class StyleFile :
 			</w:style>
 			</w:styles>"""
 
-	def getStyleFile(self) :
+	def getXml(self) :
 		return self.xmlString
 
 class ThemeFile() :
 
+	path = 'word/theme/theme1.xml'
+
 	def __init__(self) :
-		self.dirName = 'word/theme'
-		self.fileName = 'theme1.xml'
 		self.xmlString = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 			<a:theme xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" name="Office Theme">
 			<a:themeElements>
@@ -628,10 +649,6 @@ class ThemeFile() :
 			<a:latin typeface="Cambria"/>
 			<a:ea typeface=""/>
 			<a:cs typeface=""/>
-			<a:font script="Jpan" typeface="ＭＳ ゴシック"/>
-			<a:font script="Hang" typeface="맑은 고딕"/>
-			<a:font script="Hans" typeface="宋体"/>
-			<a:font script="Hant" typeface="新細明體"/>
 			<a:font script="Arab" typeface="Times New Roman"/>
 			<a:font script="Hebr" typeface="Times New Roman"/>
 			<a:font script="Thai" typeface="Angsana New"/>
@@ -662,10 +679,6 @@ class ThemeFile() :
 			<a:latin typeface="Calibri"/>
 			<a:ea typeface=""/>
 			<a:cs typeface=""/>
-			<a:font script="Jpan" typeface="ＭＳ 明朝"/>
-			<a:font script="Hang" typeface="맑은 고딕"/>
-			<a:font script="Hans" typeface="宋体"/>
-			<a:font script="Hant" typeface="新細明體"/>
 			<a:font script="Arab" typeface="Arial"/>
 			<a:font script="Hebr" typeface="Arial"/>
 			<a:font script="Thai" typeface="Cordia New"/>
@@ -864,5 +877,5 @@ class ThemeFile() :
 			<a:extraClrSchemeLst/>
 			</a:theme>"""
 
-	def getThemeFile(self) :
+	def getXml(self) :
 		return self.xmlString

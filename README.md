@@ -4,6 +4,7 @@ Simple docx editor written in python.
 
 Changelog:
 ##### 30-07-2015
+- Option to create an empty word document from scratch with default settings
 - Added default xml files, for creating new docx files
 - Added option to give an Heading with an paragraph, implemented heading 1 to 5
 

@@ -5,7 +5,9 @@ from items.paragraph import Paragraph
 from items.hyperlink import Hyperlink
 from items.table import Table
 from items.list import List
-from items.files import StyleFile
+from items.files import (
+ StyleFile, AppFile, RelationshipFile, DocumentRelationshipFile, CoreFile, DocumentFile, ContentTypeFile, SettingsFile, FontTableFile, WebSettingsFile, ThemeFile
+)
 
 WPREFIXES = {
         'w' : '{http://schemas.openxmlformats.org/wordprocessingml/2006/main}'
@@ -16,15 +18,18 @@ class Document :
     _doc = ''
     files = {}
 
-    def __init__(self, filename) :
-        if not zipfile.is_zipfile(filename) :
-            raise TypeError("Not an correct docx file.")
+    def __init__(self, filename=None) :
+        self.filename = filename
 
-        self._doc = zipfile.ZipFile(filename)
-        #scan zipfile for header/document and footer xml files
-        for path in self._doc.namelist() :
-            if path == 'word/document.xml' or path == 'word/_rels/document.xml.rels' or 'header' in path or 'footer' in path :
-                self.files[path] = etree.fromstring(self._doc.read(path))
+        if filename :
+            if not zipfile.is_zipfile(filename) :
+                raise TypeError("Not an correct docx file.")
+
+            self._doc = zipfile.ZipFile(filename)
+            #scan zipfile for header/document and footer xml files
+            for path in self._doc.namelist() :
+                if path == 'word/document.xml' or path == 'word/_rels/document.xml.rels' or 'header' in path or 'footer' in path :
+                    self.files[path] = etree.fromstring(self._doc.read(path))
         
     #read document header as xml and returning text as list
     def readHeader(self) :
@@ -149,18 +154,31 @@ class Document :
     #save document with new values
     def save(self, filename) :
         docxFile = zipfile.ZipFile(filename, mode='w', compression=zipfile.ZIP_DEFLATED)
+        if not self.filename :
+            docxFile.writestr(RelationshipFile().path, RelationshipFile().getXml())
+            docxFile.writestr(DocumentRelationshipFile().path, DocumentRelationshipFile().getXml())
+            docxFile.writestr(AppFile().path, AppFile().getXml())
+            docxFile.writestr(CoreFile().path, CoreFile().getXml())
+            docxFile.writestr(DocumentFile().path, DocumentFile().getXml())
+            docxFile.writestr(ContentTypeFile().path, ContentTypeFile().getXml())
+            docxFile.writestr(SettingsFile().path, SettingsFile().getXml())
+            docxFile.writestr(FontTableFile().path, FontTableFile().getXml())
+            docxFile.writestr(WebSettingsFile().path, WebSettingsFile().getXml())
+            docxFile.writestr(StyleFile().path, StyleFile().getXml())
+            docxFile.writestr(ThemeFile().path, ThemeFile().getXml())
+        else :
+            
+            #copy from old docx every file except the files that are in files list
+            for path in self._doc.namelist() :
+                if path not in self.files :
+                    if path == 'word/styles.xml' :
+                        styleFile = etree.fromstring(StyleFile().getStyleFile())
+                        docxFile.writestr('word/styles.xml', etree.tostring(styleFile, pretty_print=True))
+                    else : docxFile = self.copyToXML(docxFile, path)
 
-        #copy from old docx every file except the files that are in files list
-        for path in self._doc.namelist() :
-            if path not in self.files :
-                if path == 'word/styles.xml' :
-                    styleFile = etree.fromstring(StyleFile().getStyleFile())
-                    docxFile.writestr('word/styles.xml', etree.tostring(styleFile, pretty_print=True))
-                else : docxFile = self.copyToXML(docxFile, path)
-
-        #add files from file list to docx
-        for key, value in self.files.items() :
-            docxFile.writestr(key, etree.tostring(value, pretty_print=True))
+            #add files from file list to docx
+            for key, value in self.files.items() :
+                docxFile.writestr(key, etree.tostring(value, pretty_print=True))
 
         docxFile.close()
 

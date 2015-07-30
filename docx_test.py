@@ -1,7 +1,7 @@
 import items.styles
 from docx import Document
 
-document = Document("test.docx")
+#document = Document("test.docx")
 
 """
 #search and replace
@@ -44,6 +44,6 @@ document.closeList(listItem)
 """
 
 #add heading
-document.addParagraph("HEADING 1", 'first', 'Heading1')
-
+#document.addParagraph("HEADING 1", 'first', 'Heading1')
+document = Document()
 document.save("test1.docx")
