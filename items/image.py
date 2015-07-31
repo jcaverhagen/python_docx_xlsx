@@ -52,10 +52,11 @@ class Image :
 	_image = ''
 	_p = ''
 
-	def __init__(self, image, rel_id, width='100%', height='100%') :
+	def __init__(self, image, id, rel_id, width='100%', height='100%') :
 		self._image = open(image)
 		image_name =  basename(self._image.name).replace(' ', '-')
-		
+		id = id
+				
 		img = PILImage.open(self._image.name)
 		imgwidth = self.pixelToEmu(img.size[0])
 		imgheight = self.pixelToEmu(img.size[1])
@@ -75,7 +76,7 @@ class Image :
 		inline = Element().createElement('inline', attr={'distT' : '0', 'distR' : '0', 'distL' : '0', 'distB' : '0'}, prefix='wp', attrprefix=None)
 		extend = Element().createElement('extent', attr={'cy' : str(int(height)), 'cx' : str(int(width))}, prefix='wp', attrprefix=None)
 		effectExtent = Element().createElement('effectExtent', attr={'l' : '19050', 't' : '0', 'r' : '0', 'b' : '0'}, prefix='wp', attrprefix=None)
-		docPr = Element().createElement('docPr', attr={'id' : '1', 'descr' : image_name, 'name' : 'Picture 0'}, prefix='wp', attrprefix=None)
+		docPr = Element().createElement('docPr', attr={'id' : str(id), 'descr' : image_name, 'name' : 'Picture 0'}, prefix='wp', attrprefix=None)
 		cNvGraphicFramePr = Element().createElement('cNvGraphicFramePr', prefix='wp')
 		graphicFrameLocks = Element().createElement('graphicFrameLocks', attr={ 'noChangeAspect' : '1'}, prefix='a', attrprefix=None) 
 		cNvGraphicFramePr.append(graphicFrameLocks)

@@ -37,6 +37,8 @@ class Document :
                     self.files[path] = DocumentFile(etree.fromstring(self._doc.read(path)))
                 if path == 'word/_rels/document.xml.rels' :
                     self.files[path] = DocumentRelationshipFile(etree.fromstring(self._doc.read(path)))
+                if path == '[Content_Types].xml' :
+                    self.files[path] = ContentTypeFile(etree.fromstring(self._doc.read(path)))
         else :
             self.files['word/document.xml'] = DocumentFile()
             self.files['word/_rels/document.xml.rels'] = DocumentRelationshipFile()
@@ -107,16 +109,18 @@ class Document :
             for path in self._doc.namelist() :
                 if 'media' in path :
                     count = count + 1
-
-            imagename = 'image' + str(count) + '.jpg'
+            id = count
+            
         else :
-            imagename = 'image' + str(len(self.images) + 1) + '.jpeg'
+            id = len(self.images)
+            
+        imagename = 'image' + str(id) + '.jpg'
 
         self.images[image] = imagename
 
         rel_id = self.files['word/_rels/document.xml.rels'].addRelation('image', imagename=imagename)
 
-        image = Image(image, rel_id, width, height)
+        image = Image(image, id, rel_id, width, height)
         doc.addElement(image.get(), position)
 
     #save document with new values
@@ -126,7 +130,7 @@ class Document :
             docxFile.writestr(RelationshipFile().path, RelationshipFile().getXml())
             docxFile.writestr(AppFile().path, AppFile().getXml())
             docxFile.writestr(CoreFile().path, CoreFile().getXml())
-            docxFile.writestr(ContentTypeFile().path, ContentTypeFile().getXml())
+            #docxFile.writestr(ContentTypeFile().path, ContentTypeFile().getXml())
             docxFile.writestr(SettingsFile().path, SettingsFile().getXml())
             docxFile.writestr(FontTableFile().path, FontTableFile().getXml())
             docxFile.writestr(WebSettingsFile().path, WebSettingsFile().getXml())
@@ -157,7 +161,7 @@ class Document :
     #search and replace function
     def searchAndReplace(self, regex, replacement) :
         for key, value in self.files.items() :
-            if key != 'word/_rels/document.xml.rels' :
+            if key != 'word/_rels/document.xml.rels' and key != '[Content_Types].xml':
                 value.searchAndReplace(regex, replacement)
 
     #copying file from old zip to new zip

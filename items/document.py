@@ -5,7 +5,8 @@ from lxml import etree
 WPREFIXES = {
         'w' : '{http://schemas.openxmlformats.org/wordprocessingml/2006/main}',
     	#relationships
-	    'r':  'http://schemas.openxmlformats.org/officeDocument/2006/relationships'
+	    'r':  'http://schemas.openxmlformats.org/officeDocument/2006/relationships',
+	    'ct' : '{http://schemas.openxmlformats.org/package/2006/content-types}'
     }
 
 class RelationshipFile() :
@@ -191,28 +192,49 @@ class DocumentFile :
 class ContentTypeFile() :
 
 	path = '[Content_Types].xml'
+	imageExtensions = {
+		'jpg' : Element().createElement('Default', attr={'Extension' : 'jpg', 'ContentType' : 'image/jpeg'}, prefix=None, attrprefix=None),
+		'jpeg' : Element().createElement('Default', attr={'Extension' : 'jpeg', 'ContentType' : 'image/jpeg'}, prefix=None, attrprefix=None),
+		'gif' : Element().createElement('Default', attr={'Extension' : 'gif', 'ContentType' : 'image/gif'}, prefix=None, attrprefix=None),
+		'png' : Element().createElement('Default', attr={'Extension' : 'png', 'ContentType' : 'image/png'}, prefix=None, attrprefix=None)
+	}
 
-	def __init__(self) :
-		self.xmlString = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-			<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
-			<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
-			<Default Extension="xml" ContentType="application/xml"/>
-			<Default Extension="jpg" ContentType="image/jpeg"/>
-			<Default Extension="gif" ContentType="image/gif"/>
-			<Default Extension="jpeg" ContentType="image/jpeg"/>
-			<Default Extension="png" ContentType="image/png"/>
-			<Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>
-			<Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/>
-			<Override PartName="/docProps/app.xml" ContentType="application/vnd.openxmlformats-officedocument.extended-properties+xml"/>
-			<Override PartName="/word/settings.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.settings+xml"/>
-			<Override PartName="/word/theme/theme1.xml" ContentType="application/vnd.openxmlformats-officedocument.theme+xml"/>
-			<Override PartName="/word/fontTable.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.fontTable+xml"/>
-			<Override PartName="/word/webSettings.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.webSettings+xml"/>
-			<Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/>
-			</Types>"""
+	def __init__(self, xml=None) :
+		if xml is not None :
+			self.xmlString = xml
+			
+			#add for default images extensions when not in file already TODO only when needed to add
+			types = self.xmlString.findall("Default")
+			for type in self.xmlString.iter() :
+				if type.tag == WPREFIXES['ct'] + 'Default' :
+					if type.attrib['Extension'] in self.imageExtensions :
+						self.imageExtensions[type.attrib['Extension']] = None
+
+			for key, value in self.imageExtensions.items() :
+				if value is not None :
+					self.xmlString.append(value)
+
+		else :
+			self.xmlString = etree.fromstring("""<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+				<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+				<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+				<Default Extension="xml" ContentType="application/xml"/>
+				<Default Extension="jpg" ContentType="image/jpeg"/>
+				<Default Extension="gif" ContentType="image/gif"/>
+				<Default Extension="jpeg" ContentType="image/jpeg"/>
+				<Default Extension="png" ContentType="image/png"/>
+				<Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>
+				<Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/>
+				<Override PartName="/docProps/app.xml" ContentType="application/vnd.openxmlformats-officedocument.extended-properties+xml"/>
+				<Override PartName="/word/settings.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.settings+xml"/>
+				<Override PartName="/word/theme/theme1.xml" ContentType="application/vnd.openxmlformats-officedocument.theme+xml"/>
+				<Override PartName="/word/fontTable.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.fontTable+xml"/>
+				<Override PartName="/word/webSettings.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.webSettings+xml"/>
+				<Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/>
+				</Types>""")
 
 	def getXml(self) :
-		return self.xmlString
+		return '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' + etree.tostring(self.xmlString, pretty_print=True)
 
 class SettingsFile() :
 

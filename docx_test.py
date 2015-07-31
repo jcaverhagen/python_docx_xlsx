@@ -7,25 +7,25 @@ DOCUMENT WITH INPUT FILE
 #using old file and add text
 document = Document('test.docx')
 #paragraph
-document.addParagraph("vanuit python toegevoegd onderaan")
-document.addParagraph("vanuit python toegevoegd na klaas", 'aftertext:klaas')
+#document.addParagraph("vanuit python toegevoegd onderaan")
+#document.addParagraph("vanuit python toegevoegd na klaas", 'aftertext:klaas')
 #search and replace
-document.searchAndReplace("klaas", "jan")
+#document.searchAndReplace("klaas", "jan")
 #hyperlink
-document.addHyperlink("Google vanuit python toegevoegd test", "http://www.google.nl", 'first')
-document.addHyperlink("link before test", "http://www.google.nl", 'beforetext:Test')
-document.addHyperlink("link after test", "http://www.google.nl", 'aftertext:Test')
+#document.addHyperlink("Google vanuit python toegevoegd test", "http://www.google.nl", 'first')
+#document.addHyperlink("link before test", "http://www.google.nl", 'beforetext:Test')
+#document.addHyperlink("link after test", "http://www.google.nl", 'aftertext:Test')
 #replace text with hyperlink
-document.makeTextHyperlink("jan", "http://www.klaas.nl")
+#document.makeTextHyperlink("jan", "http://www.klaas.nl")
 
 #add table with 3 columns
-table = document.addTable(5000, 3)
-table.addRow({'test1', 'test2', 'test3'})
-table.addRow({'test4', 'test5', 'test6'})
-table.addRow({'test7', 'test8', 'test9'})
-document.closeTable(table)
+#table = document.addTable(5000, 3)
+#table.addRow({'test1', 'test2', 'test3'})
+#table.addRow({'test4', 'test5', 'test6'})
+#table.addRow({'test7', 'test8', 'test9'})
+#document.closeTable(table)
 
-#document.addImage('image.jpg')
+document.addImage('image.jpg', width='20%', height='20%')
 
 document.save("test1.docx")
 
