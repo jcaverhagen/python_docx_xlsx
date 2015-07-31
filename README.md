@@ -3,6 +3,9 @@
 Simple docx editor written in python.
 
 Changelog:
+##### 31-07-2015
+- Implemented method to add images to document (just the basics)
+
 ##### 30-07-2015
 - Added primary colors for font color and underline color
 - Implemented style for paragraph, bold, italic, underline, uppercase, color and font

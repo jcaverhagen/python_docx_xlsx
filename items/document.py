@@ -41,14 +41,20 @@ class DocumentRelationshipFile() :
 				<Relationship Id="rId4" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/fontTable" Target="fontTable.xml"/>
 				</Relationships>""")
 
-	def addRelation(self, type, url=None) :
+	def addRelation(self, type, url=None, imagename='') :
+		new_id = self._getHighestRelationId() + 1
 		if type == 'hyperlink' :
-			new_id = self._getHighestRelationId() + 1
 			attr = {'Id' : 'rId' + str(new_id), 'Type' : WPREFIXES['r'] + '/hyperlink', 'Target' : url, 'TargetMode' : 'External'}
 			rel = Element().createElement('Relationship', prefix=None, attr=attr)
 			self._rels.append(rel)
 			
 			return new_id
+		if type == 'image' :
+			attr = {'Id' : 'rId' + str(new_id), 'Type' : WPREFIXES['r'] + '/image', 'Target' : 'media/' + imagename}
+			rel = Element().createElement('Relationship', prefix=None, attr=attr)
+			self._rels.append(rel)
+
+		return new_id
 
 	#search for highest id in relations xml
 	def _getHighestRelationId(self) :
@@ -60,7 +66,7 @@ class DocumentRelationshipFile() :
 		return highest
 
 	def getXml(self) :
-		return etree.tostring(self._rels, pretty_print=True)
+		return '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' + etree.tostring(self._rels, pretty_print=True)
 
 class AppFile :
 
@@ -73,7 +79,7 @@ class AppFile :
 
 		self.xmlString = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 			<Properties xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties" xmlns:vt="http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes">
-			<Template>Normal</Template>
+			<Template>Normal.dotm</Template>
 			<TotalTime>0</TotalTime>
 			<Pages>1</Pages>
 			<Words>0</Words>
@@ -180,7 +186,7 @@ class DocumentFile :
 		return position
 
 	def getXml(self) :
-		return etree.tostring(self._doc, pretty_print=True)
+		return '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' + etree.tostring(self._doc, pretty_print=True)
 
 class ContentTypeFile() :
 
@@ -191,10 +197,10 @@ class ContentTypeFile() :
 			<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
 			<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
 			<Default Extension="xml" ContentType="application/xml"/>
-			<Default ContentType="image/jpeg" Extension="jpg"/>
-			<Default ContentType="image/gif" Extension="gif"/>
-			<Default ContentType="image/jpeg" Extension="jpeg"/>
-			<Default ContentType="image/png" Extension="png"/>
+			<Default Extension="jpg" ContentType="image/jpeg"/>
+			<Default Extension="gif" ContentType="image/gif"/>
+			<Default Extension="jpeg" ContentType="image/jpeg"/>
+			<Default Extension="png" ContentType="image/png"/>
 			<Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>
 			<Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/>
 			<Override PartName="/docProps/app.xml" ContentType="application/vnd.openxmlformats-officedocument.extended-properties+xml"/>
@@ -216,6 +222,7 @@ class SettingsFile() :
 		self.xmlString = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 			<w:settings xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w10="urn:schemas-microsoft-com:office:word" xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:sl="http://schemas.openxmlformats.org/schemaLibrary/2006/main">
 			<w:zoom w:percent="100"/>
+			<w:proofState w:spelling="clean" w:grammar="clean" />
 			<w:defaultTabStop w:val="708"/>
 			<w:hyphenationZone w:val="425"/>
 			<w:characterSpacingControl w:val="doNotCompress"/>
@@ -280,6 +287,13 @@ class FontTableFile() :
 			<w:family w:val="roman"/>
 			<w:pitch w:val="variable"/>
 			<w:sig w:usb0="E00002FF" w:usb1="400004FF" w:usb2="00000000" w:usb3="00000000" w:csb0="0000019F" w:csb1="00000000"/>
+			</w:font>
+			<w:font w:name="Tahoma">
+			<w:panose1 w:val="020B0604030504040204"/>
+			<w:charset w:val="00"/>
+			<w:family w:val="swiss"/>
+			<w:pitch w:val="variable"/>
+			<w:sig w:usb0="E1002EFF" w:usb1="C000605B" w:usb2="00000029" w:usb3="00000000" w:csb0="000101FF" w:csb1="00000000"/>
 			</w:font>
 			</w:fonts>"""
 
@@ -722,6 +736,36 @@ class StyleFile :
 			<w:ind w:left="720"/>
 			<w:contextualSpacing/>
 			</w:pPr>
+			</w:style>
+			<w:style w:type="paragraph" w:styleId="BalloonText">
+			<w:name w:val="Balloon Text"/>
+			<w:basedOn w:val="Normal"/>
+			<w:link w:val="BalloonTextChar"/>
+			<w:uiPriority w:val="99"/>
+			<w:semiHidden/>
+			<w:unhideWhenUsed/>
+			<w:rsid w:val="008752CF"/>
+			<w:pPr>
+			<w:spacing w:after="0" w:line="240" w:lineRule="auto"/>
+			</w:pPr>
+			<w:rPr>
+			<w:rFonts w:ascii="Tahoma" w:hAnsi="Tahoma" w:cs="Tahoma"/>
+			<w:sz w:val="16"/>
+			<w:szCs w:val="16"/>
+			</w:rPr>
+			</w:style>
+			<w:style w:type="character" w:customStyle="1" w:styleId="BalloonTextChar">
+			<w:name w:val="Balloon Text Char"/>
+			<w:basedOn w:val="DefaultParagraphFont"/>
+			<w:link w:val="BalloonText"/>
+			<w:uiPriority w:val="99"/>
+			<w:semiHidden/>
+			<w:rsid w:val="008752CF"/>
+			<w:rPr>
+			<w:rFonts w:ascii="Tahoma" w:hAnsi="Tahoma" w:cs="Tahoma"/>
+			<w:sz w:val="16"/>
+			<w:szCs w:val="16"/>
+			</w:rPr>
 			</w:style>
 			</w:styles>"""
 
