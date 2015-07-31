@@ -4,6 +4,8 @@ Simple docx editor written in python.
 
 Changelog:
 ##### 31-07-2015
+- Fixed list position and order
+- Fixed table column order
 - Implemented breaks and page breaks as elements
 - Fixed issue when add an other image extension to existed document. (temp fix add as default all images extensions to [Content_Types].xml)
 - option to post width and height with new image (percentages). Default 100%

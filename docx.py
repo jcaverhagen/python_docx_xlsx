@@ -94,12 +94,12 @@ class Document :
         doc = self.files['word/document.xml']
         listItems = listItem.get()
         
-        if listItem.get() == 'last' :
-             for item in listItems :
-                doc.addElement(item, listItem.get())
+        if listItem.getPosition() == 'first' :
+             for item in reversed(listItems) :
+                doc.addElement(item, listItem.getPosition())
         else :
-            for item in reversed(listItems) :
-                doc.addElement(item, listItem.get())
+            for item in listItems :
+                doc.addElement(item, listItem.getPosition())
 
     def addImage(self, image, position='last', width='100%', height='100%') :
         doc = self.files['word/document.xml']

@@ -20,9 +20,9 @@ document.makeTextHyperlink("jan", "http://www.klaas.nl")
 
 #add table with 3 columns
 table = document.addTable(5000, 3)
-table.addRow({'test1', 'test2', 'test3'})
-table.addRow({'test4', 'test5', 'test6'})
-table.addRow({'test7', 'test8', 'test9'})
+table.addRow(['test1', 'test2', 'test3'])
+table.addRow(['test4', 'test5', 'test6'])
+table.addRow(['test7', 'test8', 'test9'])
 document.closeTable(table)
 
 document.addImage('image.jpg', width='20%', height='20%')
@@ -49,15 +49,15 @@ document.makeTextHyperlink("jan", "http://www.klaas.nl")
 
 #add table with 3 columns
 table = document.addTable(5000, 3)
-table.addRow({'test1', 'test2', 'test3'})
-table.addRow({'test4', 'test5', 'test6'})
-table.addRow({'test7', 'test8', 'test9'})
+table.addRow(['test1', 'test2', 'test3'])
+table.addRow(['test4', 'test5', 'test6'])
+table.addRow(['test7', 'test8', 'test9'])
 document.closeTable(table)
 #add table with 2 columns at top
 table = document.addTable(5000, 2, position='first')
-table.addRow({'test1', 'test2'})
-table.addRow({'test4', 'test5'})
-table.addRow({'test7', 'test8'})
+table.addRow(['test1', 'test2'])
+table.addRow(['test4', 'test5'])
+table.addRow(['test7', 'test8'])
 document.closeTable(table)
 
 #insert page break
