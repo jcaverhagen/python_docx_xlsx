@@ -1,7 +1,7 @@
 #!/usr/bin/python
 import zipfile
 from lxml import etree
-from items.paragraph import Paragraph
+from items.paragraph import Paragraph, Break
 from items.hyperlink import Hyperlink
 from items.table import Table
 from items.list import List
@@ -122,6 +122,11 @@ class Document :
 
         image = Image(image, id, rel_id, width, height)
         doc.addElement(image.get(), position)
+
+    def insertBreak(self, type, position='last') :
+        doc = self.files['word/document.xml']
+        breakEl = Break(type)
+        doc.addElement(breakEl.get(), position)
 
     #save document with new values
     def save(self, filename) :

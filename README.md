@@ -3,8 +3,8 @@
 Simple docx editor written in python.
 
 Changelog:
-<sub>
 ##### 31-07-2015
+- Implemented breaks and page breaks as elements
 - Fixed issue when add an other image extension to existed document. (temp fix add as default all images extensions to [Content_Types].xml)
 - option to post width and height with new image (percentages). Default 100%
 - Implemented method to add images to document (just the basics)
@@ -36,4 +36,3 @@ Changelog:
 - Including header / footer search and replace
 - Search and replace function
 - Copy function
-</sub>

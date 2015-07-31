@@ -59,3 +59,15 @@ class Paragraph :
 	
 	def get(self) :
 		return self.para
+
+class Break :
+
+	def __init__(self, type=None) :
+		if type == 'page' :
+			self.breakEl = Element().createElement('br', attr={'type' : 'page'})
+		else :
+			self.breakEl = Element().createElement('br')
+
+
+	def get(self) :
+		return self.breakEl
