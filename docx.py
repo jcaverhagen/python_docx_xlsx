@@ -112,8 +112,6 @@ class Document :
         else :
             imagename = 'image' + str(len(self.images) + 1) + '.jpeg'
 
-        print imagename
-
         self.images[image] = imagename
 
         rel_id = self.files['word/_rels/document.xml.rels'].addRelation('image', imagename=imagename)
