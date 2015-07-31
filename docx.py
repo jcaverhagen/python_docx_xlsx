@@ -99,7 +99,7 @@ class Document :
             for item in reversed(listItems) :
                 doc.addElement(item, listItem.get())
 
-    def addImage(self, image) :
+    def addImage(self, image, position='last', width='100%', height='100%') :
         doc = self.files['word/document.xml']
 
         count = 1
@@ -116,8 +116,8 @@ class Document :
 
         rel_id = self.files['word/_rels/document.xml.rels'].addRelation('image', imagename=imagename)
 
-        image = Image(image, rel_id)
-        doc.addElement(image.get())
+        image = Image(image, rel_id, width, height)
+        doc.addElement(image.get(), position)
 
     #save document with new values
     def save(self, filename) :

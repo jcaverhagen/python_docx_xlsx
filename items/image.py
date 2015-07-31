@@ -1,7 +1,7 @@
 from lxml import etree
 from element import Element
 from os.path import basename
-from PIL import Image
+from PIL import Image as PILImage
 
 _basic = """<w:p>
 				<w:r>
@@ -55,8 +55,13 @@ class Image :
 	def __init__(self, image, rel_id, width='100%', height='100%') :
 		self._image = open(image)
 		image_name =  basename(self._image.name).replace(' ', '-')
-		width = '5760720'
-		height = '4320540'
+		
+		img = PILImage.open(self._image.name)
+		imgwidth = self.pixelToEmu(img.size[0])
+		imgheight = self.pixelToEmu(img.size[1])
+		width = (float(width.replace('%', '')) / 100) * imgwidth
+		height = (float(height.replace('%', '')) / 100) * imgheight
+
 		rel_id = rel_id
 		
 		self._p = Element().createElement('p')
@@ -68,15 +73,15 @@ class Image :
 		rPr.append(lang)
 		drawing = Element().createElement('drawing')
 		inline = Element().createElement('inline', attr={'distT' : '0', 'distR' : '0', 'distL' : '0', 'distB' : '0'}, prefix='wp', attrprefix=None)
-		extend = Element().createElement('extent', attr={'cy' : height, 'cx' : width}, prefix='wp', attrprefix=None)
+		extend = Element().createElement('extent', attr={'cy' : str(int(height)), 'cx' : str(int(width))}, prefix='wp', attrprefix=None)
 		effectExtent = Element().createElement('effectExtent', attr={'l' : '19050', 't' : '0', 'r' : '0', 'b' : '0'}, prefix='wp', attrprefix=None)
-		docPr = Element().createElement('docPr', attr={'id' : '2', 'descr' : image_name, 'name' : 'Picture 0'}, prefix='wp', attrprefix=None)
+		docPr = Element().createElement('docPr', attr={'id' : '1', 'descr' : image_name, 'name' : 'Picture 0'}, prefix='wp', attrprefix=None)
 		cNvGraphicFramePr = Element().createElement('cNvGraphicFramePr', prefix='wp')
-		graphicFrameLocks = Element().createElement('graphicFrameLocks', attr={ 'noChangeAspect' : '1'}, prefix='a', attrprefix=None) #'xmlns' : 'http://schemas.openxmlformats.org/drawingml/2006/main',
+		graphicFrameLocks = Element().createElement('graphicFrameLocks', attr={ 'noChangeAspect' : '1'}, prefix='a', attrprefix=None) 
 		cNvGraphicFramePr.append(graphicFrameLocks)
-		graphic = Element().createElement('graphic', prefix='a') #attr={'xmlns' : 'http://schemas.openxmlformats.org/drawingml/2006/main'},
+		graphic = Element().createElement('graphic', prefix='a') 
 		graphicData = Element().createElement('graphicData', attr={'uri' : 'http://schemas.openxmlformats.org/drawingml/2006/picture'}, prefix='a', attrprefix=None)
-		pic = Element().createElement('pic',  prefix='pic') #attr={'xmlns' : 'http://schemas.openxmlformats.org/drawingml/2006/picture'},
+		pic = Element().createElement('pic',  prefix='pic')
 		nvPicPr = Element().createElement('nvPicPr', prefix='pic')
 		cNvPr = Element().createElement('cNvPr', attr={'id' : '0', 'name' : image_name}, prefix='pic', attrprefix=None)
 		cNvPicPr = Element().createElement('cNvPicPr', prefix='pic')
@@ -92,7 +97,7 @@ class Image :
 		spPr = Element().createElement('spPr', prefix='pic')
 		xfrm = Element().createElement('xfrm', prefix='a')
 		off = Element().createElement('off', attr={'y' : '0', 'x' : '0'}, prefix='a', attrprefix=None)
-		ext = Element().createElement('ext', attr={'cy' : height, 'cx' : width}, prefix='a', attrprefix=None)
+		ext = Element().createElement('ext', attr={'cy' : str(int(height)), 'cx' : str(int(width))}, prefix='a', attrprefix=None)
 		xfrm.append(off)
 		xfrm.append(ext)
 		prstGeom = Element().createElement('prstGeom', attr={'prst' : 'rect'}, prefix='a', attrprefix=None)
@@ -114,6 +119,9 @@ class Image :
 		r.append(rPr)
 		r.append(drawing)
 		self._p.append(r)
+
+	def pixelToEmu(self, pixel) :
+		return int(round(pixel * 12700))
 
 	def get(self) :
 		return self._p

@@ -74,6 +74,6 @@ document.closeList(listItem)
 document.addParagraph("This file is created through python for testing", 'first', 'Heading1', bold=True)
 
 #add image to end of file
-document.addImage('image.jpg')
+document.addImage('image.jpg', position='first', width='10%', height='10%')
 
 document.save("test2.docx")

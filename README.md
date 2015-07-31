@@ -4,6 +4,7 @@ Simple docx editor written in python.
 
 Changelog:
 ##### 31-07-2015
+- option to post width and height with new image (percentages). Default 100%
 - Implemented method to add images to document (just the basics)
 
 ##### 30-07-2015
