@@ -6,17 +6,11 @@ from items.hyperlink import Hyperlink
 from items.table import Table
 from items.list import List
 from items.image import Image
-from items.header import HeaderFile
-from items.footer import FooterFile
 from items.document import (
- StyleFile, AppFile, RelationshipFile, DocumentRelationshipFile, CoreFile, DocumentFile, 
+ StyleFile, AppFile, RelationshipFile, DocumentRelationshipFile, CoreFile, DocumentFile, HeaderFile, FooterFile,
  ContentTypeFile, NumberingFile, SettingsFile, FontTableFile, StylesWithEffectsFile, WebSettingsFile, ThemeFile
 )
 from PIL import Image as PILImage
-
-WPREFIXES = {
-        'w' : '{http://schemas.openxmlformats.org/wordprocessingml/2006/main}'
-    }
 
 class Document :
     
@@ -47,14 +41,6 @@ class Document :
             self.files['word/_rels/document.xml.rels'] = DocumentRelationshipFile()
             self.files['[Content_Types].xml'] = ContentTypeFile()
             self.files['word/settings.xml'] = SettingsFile()
-
-    #read document header as xml and returning text as list
-    def readHeader(self) :
-        return self._readTextFromXML(self._header)
-
-    #read document body as xml and returning text as list
-    def readDocument(self) :
-        return self._readTextFromXML(self._body)
 
     #add paragraph as first
     def addParagraph(self, text, position='last', style='NormalWeb', bold=False, italic=False, 
@@ -148,7 +134,6 @@ class Document :
                 if 'media' in path :
                     count = count + 1
             id = count
-            
         else :
             id = len(self.images)
             
@@ -174,7 +159,6 @@ class Document :
             docxFile.writestr(AppFile().path, AppFile().getXml())
             docxFile.writestr(CoreFile().path, CoreFile().getXml())
             docxFile.writestr(NumberingFile().path, NumberingFile().getXml())
-            #docxFile.writestr(SettingsFile().path, SettingsFile().getXml())
             docxFile.writestr(FontTableFile().path, FontTableFile().getXml())
             docxFile.writestr(WebSettingsFile().path, WebSettingsFile().getXml())
             docxFile.writestr(StyleFile().path, StyleFile().getXml())
@@ -212,14 +196,3 @@ class Document :
     def copyToXML(self, docx, path) :
         docx.writestr(path, self._doc.read(path))
         return docx
-
-    #search for text tag in xml files
-    def _readTextFromXML(self, xml) :
-        returnList = []
-        for el in xml.iter() :
-            if el.tag == WPREFIXES['w'] + 'p' :
-                for e in el.iter() :
-                    if e.tag == WPREFIXES['w'] + 't' :
-                        returnList.append(e.text)
-
-        return returnList
