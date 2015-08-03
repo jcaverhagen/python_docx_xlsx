@@ -46,6 +46,7 @@ NEW DOCUMENT WITH NO INPUT FILE, CREATING FROM SCRATCH
 #creating complete file
 document = Document()
 #paragraph
+"""
 document.addParagraph("vanuit python toegevoegd onderaan", bold=True, italic=True, underline='red', 
 					uppercase=True, color='red', font='Times New Roman')
 document.addParagraph("vanuit python toegevoegd na klaas", 'aftertext:klaas')
@@ -58,6 +59,9 @@ document.addHyperlink("link before test", "http://www.google.nl", 'beforetext:Te
 document.addHyperlink("link after test", "http://www.google.nl", 'aftertext:Test')
 #replace text with hyperlink
 document.makeTextHyperlink("jan", "http://www.klaas.nl")
+
+#pagebreak
+document.insertBreak('page')
 
 #add table with 3 columns
 table = document.addTable(5000, 3)
@@ -94,4 +98,13 @@ document.addParagraph("This file is created through python for testing", 'first'
 #add image to end of file
 document.addImage('image.jpg', position='first', width='10%', height='10%')
 document.addImage('image1.jpg', width='30%', height='30%')
+
+#pagebreak
+document.insertBreak('page')
+document.addParagraph("vanuit python toegevoegd onderaan", bold=True, italic=True, underline='red', 
+					uppercase=True, color='red', font='Times New Roman')
+"""
+
+document.addHeader('Header tekst')
+
 document.save("test2.docx")

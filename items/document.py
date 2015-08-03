@@ -43,16 +43,27 @@ class DocumentRelationshipFile() :
 				<Relationship Id="rId6" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/numbering" Target="numbering.xml"/>
 				</Relationships>""")
 
-	def addRelation(self, type, url=None, imagename='') :
+	def addRelation(self, type, url=None, imagename='', headertype='default') :
 		new_id = self._getHighestRelationId() + 1
 		if type == 'hyperlink' :
 			attr = {'Id' : 'rId' + str(new_id), 'Type' : WPREFIXES['r'] + '/hyperlink', 'Target' : url, 'TargetMode' : 'External'}
 			rel = Element().createElement('Relationship', prefix=None, attr=attr)
 			self._rels.append(rel)
 			
-			return new_id
 		if type == 'image' :
 			attr = {'Id' : 'rId' + str(new_id), 'Type' : WPREFIXES['r'] + '/image', 'Target' : 'media/' + imagename}
+			rel = Element().createElement('Relationship', prefix=None, attr=attr)
+			self._rels.append(rel)
+		
+		if type == 'header' :
+			if headertype == 'even' :
+				file = 'header1.xml'
+			elif headertype == 'first' :
+				file = 'header3.xml'
+			else :
+				file = 'header2.xml'
+
+			attr = {'Id' : 'rId' + str(new_id), 'Type' : WPREFIXES['r'] + '/header', 'Target' : file}
 			rel = Element().createElement('Relationship', prefix=None, attr=attr)
 			self._rels.append(rel)
 
@@ -135,6 +146,12 @@ class DocumentFile :
 			self._doc = etree.fromstring("""<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 				<w:document xmlns:ve="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" xmlns:w10="urn:schemas-microsoft-com:office:word" xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:wne="http://schemas.microsoft.com/office/word/2006/wordml">
 				<w:body>
+					<w:sectPr>
+						<w:pgSz w:w="11906" w:h="16838"/>
+						<w:pgMar w:top="1417" w:right="1417" w:bottom="1417" w:left="1417" w:header="708" w:footer="708" w:gutter="0"/>
+						<w:cols w:space="708"/>
+						<w:docGrid w:linePitch="360"/>
+					</w:sectPr>
 				</w:body>
 				</w:document>""")
 
@@ -187,6 +204,16 @@ class DocumentFile :
 								return position
 		return position
 
+	def addReference(self, filetype, type, id) :
+		if filetype == 'header' :
+			Reference = Element().createElement('headerReference', attr={'type' : type, 'rel_id' : 'rId' + str(id)})
+		else : 
+			Reference = Element().createElement('footerReference', attr={'type' : type, 'rel_id' : 'rId' + str(id)})
+
+		for el in self._doc.iter() :
+			if el.tag == WPREFIXES['w'] + 'sectPr' :
+				el.append(Reference)
+
 	def getXml(self) :
 		return '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' + etree.tostring(self._doc, pretty_print=True)
 
@@ -233,6 +260,7 @@ class ContentTypeFile() :
 				<Override PartName="/word/webSettings.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.webSettings+xml"/>
 				<Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/>
 				<Override PartName="/word/numbering.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.numbering+xml"/>
+				<Override PartName="/word/header2.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.header+xml"/>
 				</Types>""")
 
 	def getXml(self) :

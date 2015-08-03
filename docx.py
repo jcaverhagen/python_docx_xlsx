@@ -6,6 +6,7 @@ from items.hyperlink import Hyperlink
 from items.table import Table
 from items.list import List
 from items.image import Image
+from items.header import HeaderFile
 from items.document import (
  StyleFile, AppFile, RelationshipFile, DocumentRelationshipFile, CoreFile, DocumentFile, 
  ContentTypeFile, NumberingFile, SettingsFile, FontTableFile, StylesWithEffectsFile, WebSettingsFile, ThemeFile
@@ -101,6 +102,14 @@ class Document :
         else :
             for item in listItems :
                 doc.addElement(item, listItem.getPosition())
+
+    #add header
+    def addHeader(self, text) :
+        doc = self.files['word/document.xml']
+        rel_id = self.files['word/_rels/document.xml.rels'].addRelation('header')
+        self.files['word/header2.xml'] = HeaderFile(text, '2')
+
+        doc.addReference('header', 'default', rel_id)
 
     def addImage(self, image, position='last', width='100%', height='100%') :
         doc = self.files['word/document.xml']
