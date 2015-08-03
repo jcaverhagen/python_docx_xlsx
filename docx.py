@@ -104,12 +104,19 @@ class Document :
                 doc.addElement(item, listItem.getPosition())
 
     #add header
-    def addHeader(self, text) :
-        doc = self.files['word/document.xml']
-        rel_id = self.files['word/_rels/document.xml.rels'].addRelation('header')
-        self.files['word/header2.xml'] = HeaderFile(text, '2')
+    def addHeader(self, text, headertype) :
+        if headertype == 'first' :
+            filenumber = 3
+        elif headertype == 'even' :
+            filenumber = 1
+        else :
+            filenumber = 2
 
-        doc.addReference('header', 'default', rel_id)
+        doc = self.files['word/document.xml']
+        rel_id = self.files['word/_rels/document.xml.rels'].addRelation('header', headertype=headertype)
+        self.files['word/header' + str(filenumber) + '.xml'] = HeaderFile(text, str(filenumber))
+
+        doc.addReference('header', headertype, rel_id)
 
     def addImage(self, image, position='last', width='100%', height='100%') :
         doc = self.files['word/document.xml']

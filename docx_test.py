@@ -38,6 +38,8 @@ document.closeList(numberedList)
 
 document.addImage('image.jpg', width='20%', height='20%')
 
+document.addHeader('Header tekst eerste pagina', 'first')
+
 document.save("test1.docx")
 
 """
@@ -46,7 +48,6 @@ NEW DOCUMENT WITH NO INPUT FILE, CREATING FROM SCRATCH
 #creating complete file
 document = Document()
 #paragraph
-"""
 document.addParagraph("vanuit python toegevoegd onderaan", bold=True, italic=True, underline='red', 
 					uppercase=True, color='red', font='Times New Roman')
 document.addParagraph("vanuit python toegevoegd na klaas", 'aftertext:klaas')
@@ -103,8 +104,8 @@ document.addImage('image1.jpg', width='30%', height='30%')
 document.insertBreak('page')
 document.addParagraph("vanuit python toegevoegd onderaan", bold=True, italic=True, underline='red', 
 					uppercase=True, color='red', font='Times New Roman')
-"""
 
-document.addHeader('Header tekst')
+document.addHeader('Header tekst eerste pagina', 'first')
+document.addHeader('Header tekst', 'default')
 
 document.save("test2.docx")

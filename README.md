@@ -4,6 +4,7 @@ Simple docx editor written in python.
 
 Changelog:
 ##### 03-08-2015
+- Implemented different first header on page 1
 - Add default header implemented, option for different first and even pages coming soon
 - Added option to have multiple levels in list (default structure file, future giving style with it)
 - Reformated code

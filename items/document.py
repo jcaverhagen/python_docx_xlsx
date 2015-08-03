@@ -214,6 +214,9 @@ class DocumentFile :
 			if el.tag == WPREFIXES['w'] + 'sectPr' :
 				el.append(Reference)
 
+				if type == 'first' :
+					el.append(Element().createElement('titlePg'))
+
 	def getXml(self) :
 		return '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' + etree.tostring(self._doc, pretty_print=True)
 
@@ -260,7 +263,9 @@ class ContentTypeFile() :
 				<Override PartName="/word/webSettings.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.webSettings+xml"/>
 				<Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/>
 				<Override PartName="/word/numbering.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.numbering+xml"/>
+				<Override PartName="/word/header1.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.header+xml"/>
 				<Override PartName="/word/header2.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.header+xml"/>
+				<Override PartName="/word/header3.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.header+xml"/>
 				</Types>""")
 
 	def getXml(self) :
