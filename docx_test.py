@@ -105,7 +105,12 @@ document.insertBreak('page')
 document.addParagraph("vanuit python toegevoegd onderaan", bold=True, italic=True, underline='red', 
 					uppercase=True, color='red', font='Times New Roman')
 
+# adding headers
 document.addHeader('Header tekst even pages', 'even')
 document.addHeader('Header tekst odd pages', 'default')
+
+#search and replace on headers
+document.searchAndReplace("odd pages", "oneven paginas")
+document.searchAndReplace("even pages", "even paginas")
 
 document.save("test2.docx")

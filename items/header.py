@@ -20,5 +20,8 @@ class HeaderFile :
 			</w:p>
 			</w:hdr>"""
 
+	def searchAndReplace(self, regex, replacement) :
+		self.text = self.text.replace(regex, replacement)
+
 	def getXml(self) :
 		return self.xmlString.format(text=self.text)
