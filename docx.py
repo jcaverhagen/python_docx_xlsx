@@ -39,10 +39,13 @@ class Document :
                     self.files[path] = DocumentRelationshipFile(etree.fromstring(self._doc.read(path)))
                 if path == '[Content_Types].xml' :
                     self.files[path] = ContentTypeFile(etree.fromstring(self._doc.read(path)))
+                if path == 'word/settings.xml' :
+                    self.files[path] = SettingsFile(etree.fromstring(self._doc.read(path)))
         else :
             self.files['word/document.xml'] = DocumentFile()
             self.files['word/_rels/document.xml.rels'] = DocumentRelationshipFile()
             self.files['[Content_Types].xml'] = ContentTypeFile()
+            self.files['word/settings.xml'] = SettingsFile()
 
     #read document header as xml and returning text as list
     def readHeader(self) :
@@ -109,6 +112,7 @@ class Document :
             filenumber = 3
         elif headertype == 'even' :
             filenumber = 1
+            self.files['word/settings.xml'].enableEvenAndOddHeaders()
         else :
             filenumber = 2
 
@@ -153,7 +157,7 @@ class Document :
             docxFile.writestr(AppFile().path, AppFile().getXml())
             docxFile.writestr(CoreFile().path, CoreFile().getXml())
             docxFile.writestr(NumberingFile().path, NumberingFile().getXml())
-            docxFile.writestr(SettingsFile().path, SettingsFile().getXml())
+            #docxFile.writestr(SettingsFile().path, SettingsFile().getXml())
             docxFile.writestr(FontTableFile().path, FontTableFile().getXml())
             docxFile.writestr(WebSettingsFile().path, WebSettingsFile().getXml())
             docxFile.writestr(StyleFile().path, StyleFile().getXml())
@@ -184,7 +188,7 @@ class Document :
     #search and replace function
     def searchAndReplace(self, regex, replacement) :
         for key, value in self.files.items() :
-            if key != 'word/_rels/document.xml.rels' and key != '[Content_Types].xml':
+            if key != 'word/_rels/document.xml.rels' and key != '[Content_Types].xml' and key != 'word/settings.xml': 
                 value.searchAndReplace(regex, replacement)
 
     #copying file from old zip to new zip

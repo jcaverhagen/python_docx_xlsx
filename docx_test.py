@@ -105,7 +105,7 @@ document.insertBreak('page')
 document.addParagraph("vanuit python toegevoegd onderaan", bold=True, italic=True, underline='red', 
 					uppercase=True, color='red', font='Times New Roman')
 
-document.addHeader('Header tekst eerste pagina', 'first')
-document.addHeader('Header tekst', 'default')
+document.addHeader('Header tekst even pages', 'even')
+document.addHeader('Header tekst odd pages', 'default')
 
 document.save("test2.docx")
