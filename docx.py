@@ -7,6 +7,7 @@ from items.table import Table
 from items.list import List
 from items.image import Image
 from items.header import HeaderFile
+from items.footer import FooterFile
 from items.document import (
  StyleFile, AppFile, RelationshipFile, DocumentRelationshipFile, CoreFile, DocumentFile, 
  ContentTypeFile, NumberingFile, SettingsFile, FontTableFile, StylesWithEffectsFile, WebSettingsFile, ThemeFile
@@ -117,10 +118,26 @@ class Document :
             filenumber = 2
 
         doc = self.files['word/document.xml']
-        rel_id = self.files['word/_rels/document.xml.rels'].addRelation('header', headertype=headertype)
+        rel_id = self.files['word/_rels/document.xml.rels'].addRelation('header', headerfootertype=headertype)
         self.files['word/header' + str(filenumber) + '.xml'] = HeaderFile(text, str(filenumber))
 
         doc.addReference('header', headertype, rel_id)
+
+    #add footer
+    def addFooter(self, text, footertype) :
+        if footertype == 'first' :
+            filenumber = 3
+        elif footertype == 'even' :
+            filenumber = 1
+            self.files['word/settings.xml'].enableEvenAndOddHeaders()
+        else :
+            filenumber = 2
+
+        doc = self.files['word/document.xml']
+        rel_id = self.files['word/_rels/document.xml.rels'].addRelation('footer', headerfootertype=footertype)
+        self.files['word/footer' + str(filenumber) + '.xml'] = FooterFile(text, str(filenumber))
+
+        doc.addReference('footer', footertype, rel_id)
 
     def addImage(self, image, position='last', width='100%', height='100%') :
         doc = self.files['word/document.xml']

@@ -43,7 +43,7 @@ class DocumentRelationshipFile() :
 				<Relationship Id="rId6" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/numbering" Target="numbering.xml"/>
 				</Relationships>""")
 
-	def addRelation(self, type, url=None, imagename='', headertype='default') :
+	def addRelation(self, type, url=None, imagename='', headerfootertype='default') :
 		new_id = self._getHighestRelationId() + 1
 		if type == 'hyperlink' :
 			attr = {'Id' : 'rId' + str(new_id), 'Type' : WPREFIXES['r'] + '/hyperlink', 'Target' : url, 'TargetMode' : 'External'}
@@ -56,14 +56,26 @@ class DocumentRelationshipFile() :
 			self._rels.append(rel)
 		
 		if type == 'header' :
-			if headertype == 'even' :
+			if headerfootertype == 'even' :
 				file = 'header1.xml'
-			elif headertype == 'first' :
+			elif headerfootertype == 'first' :
 				file = 'header3.xml'
 			else :
 				file = 'header2.xml'
 
 			attr = {'Id' : 'rId' + str(new_id), 'Type' : WPREFIXES['r'] + '/header', 'Target' : file}
+			rel = Element().createElement('Relationship', prefix=None, attr=attr)
+			self._rels.append(rel)
+
+		if type == 'footer' :
+			if headerfootertype == 'even' :
+				file = 'footer1.xml'
+			elif headerfootertype == 'first' :
+				file = 'footer3.xml'
+			else :
+				file = 'footer2.xml'
+
+			attr = {'Id' : 'rId' + str(new_id), 'Type' : WPREFIXES['r'] + '/footer', 'Target' : file}
 			rel = Element().createElement('Relationship', prefix=None, attr=attr)
 			self._rels.append(rel)
 
@@ -266,6 +278,9 @@ class ContentTypeFile() :
 				<Override PartName="/word/header1.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.header+xml"/>
 				<Override PartName="/word/header2.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.header+xml"/>
 				<Override PartName="/word/header3.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.header+xml"/>
+				<Override PartName="/word/footer1.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.footer+xml"/>
+				<Override PartName="/word/footer2.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.footer+xml"/>
+				<Override PartName="/word/footer3.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.footer+xml"/>
 				</Types>""")
 
 	def getXml(self) :
@@ -274,6 +289,7 @@ class ContentTypeFile() :
 class SettingsFile() :
 
 	path = 'word/settings.xml'
+	enableEvenAndOddHeaders = False
 	
 	def __init__(self, xml=None) :
 		if xml is not None :
@@ -318,7 +334,9 @@ class SettingsFile() :
 				</w:settings>""")
 
 	def enableEvenAndOddHeaders(self) :
-		self.settings.append(Element().createElement('evenAndOddHeaders'))
+		if self.enableEvenAndOddHeaders == False :
+			self.settings.append(Element().createElement('evenAndOddHeaders'))
+			self.enableEvenAndOddHeaders = True
 
 	def getXml(self) :
 		return etree.tostring(self.settings, pretty_print=True)

@@ -109,6 +109,9 @@ document.addParagraph("vanuit python toegevoegd onderaan", bold=True, italic=Tru
 document.addHeader('Header tekst even pages', 'even')
 document.addHeader('Header tekst odd pages', 'default')
 
+document.addFooter('Default footer text', 'default')
+document.addFooter('Different footer text', 'first')
+
 #search and replace on headers
 document.searchAndReplace("odd pages", "oneven paginas")
 document.searchAndReplace("even pages", "even paginas")

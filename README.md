@@ -4,6 +4,7 @@ Simple docx editor written in python.
 
 Changelog:
 ##### 03-08-2015
+- Implemented Footers (even, odd, first and default settings)
 - Fixed search and replace for header files
 - Implemented different headers for odd and even pages
 - Implemented different first header on page 1
