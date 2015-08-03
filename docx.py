@@ -8,7 +8,7 @@ from items.list import List
 from items.image import Image
 from items.document import (
  StyleFile, AppFile, RelationshipFile, DocumentRelationshipFile, CoreFile, DocumentFile, 
- ContentTypeFile, SettingsFile, FontTableFile, WebSettingsFile, ThemeFile
+ ContentTypeFile, NumberingFile, SettingsFile, FontTableFile, StylesWithEffectsFile, WebSettingsFile, ThemeFile
 )
 from PIL import Image as PILImage
 
@@ -18,11 +18,10 @@ WPREFIXES = {
 
 class Document :
     
-    _doc = ''
-    files = {}
-    images = {}
-
     def __init__(self, filename=None) :
+        self._doc = ''
+        self.files = {}
+        self.images = {}
         self.filename = filename
 
         if filename :
@@ -42,6 +41,8 @@ class Document :
         else :
             self.files['word/document.xml'] = DocumentFile()
             self.files['word/_rels/document.xml.rels'] = DocumentRelationshipFile()
+            self.files['[Content_Types].xml'] = ContentTypeFile()
+
     #read document header as xml and returning text as list
     def readHeader(self) :
         return self._readTextFromXML(self._header)
@@ -86,8 +87,8 @@ class Document :
         doc.addElement(table.get(), table.getPosition())
 
     #init an new list and return object to caller
-    def addList(self, position, type) :
-        return List(position, type)
+    def addList(self, position='last') :
+        return List(position)
         
     #close list and inserting it in document
     def closeList(self, listItem) :
@@ -135,12 +136,13 @@ class Document :
             docxFile.writestr(RelationshipFile().path, RelationshipFile().getXml())
             docxFile.writestr(AppFile().path, AppFile().getXml())
             docxFile.writestr(CoreFile().path, CoreFile().getXml())
-            #docxFile.writestr(ContentTypeFile().path, ContentTypeFile().getXml())
+            docxFile.writestr(NumberingFile().path, NumberingFile().getXml())
             docxFile.writestr(SettingsFile().path, SettingsFile().getXml())
             docxFile.writestr(FontTableFile().path, FontTableFile().getXml())
             docxFile.writestr(WebSettingsFile().path, WebSettingsFile().getXml())
             docxFile.writestr(StyleFile().path, StyleFile().getXml())
             docxFile.writestr(ThemeFile().path, ThemeFile().getXml())
+            docxFile.writestr(StylesWithEffectsFile().path, StylesWithEffectsFile().getXml())
             
         else :
             

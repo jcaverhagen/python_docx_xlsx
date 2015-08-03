@@ -8,45 +8,31 @@ _basic = """<w:p>
 						<w:ilvl w:val="0"/>
 						<w:numId w:val="1"/>
 					</w:numPr>
-					<w:ind w:start="10"/>
 				</w:pPr>
 				<w:r>
 					<w:t>This is the first numbered paragraph.</w:t>
 				</w:r>
 			</w:p>"""
 
-list_types = {
-	'numeric' : '1',
-	'bullet' : '2'
-}
-
 class List :
 
-	_list = []
-	_position = ''
-	_type = ''
-	
-	def __init__(self, position='last', type='numeric') :
+	def __init__(self, position='last') :
 		self._position = position
-		if type in list_types :
-			self._type = list_types[type]
-		else :
-			self._type = list_types['numberic']
+		
+		self._list = []
 
-	def addItem(self, text) :
+	def addItem(self, text, level = 0) :
 		p		= Element().createElement('p')
 		pPr 	= Element().createElement('pPr')
 		p.append(pPr)
 
 		style 	= Element().createElement('pStyle', attr={'val' : 'ListParagraph'})
 		numPr	= Element().createElement('numPr')
-		ind		= Element().createElement('ind', attr={'left' : '5', 'firstLine' : '400'})
 		pPr.append(style)
 		pPr.append(numPr)
-		pPr.append(ind)
-
-		levels	= Element().createElement('ilvl', attr={'val' : '0'})
-		numId	= Element().createElement('numId', attr={'val' : self._type})
+		
+		levels	= Element().createElement('ilvl', attr={'val' : str(level)})
+		numId	= Element().createElement('numId', attr={'val' : '1'})
 		numPr.append(levels)
 		numPr.append(numId)
 

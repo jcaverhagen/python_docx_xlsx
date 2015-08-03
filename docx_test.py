@@ -25,6 +25,17 @@ table.addRow(['test4', 'test5', 'test6'])
 table.addRow(['test7', 'test8', 'test9'])
 document.closeTable(table)
 
+#list
+numberedList = document.addList('first')
+numberedList.addItem('piet')
+numberedList.addItem('henk')
+numberedList.addItem('Jan')
+numberedList.addItem('Klaas', level=1)
+numberedList.addItem('Rene', level=1)
+numberedList.addItem('Frits')
+numberedList.addItem('Bert')
+document.closeList(numberedList)
+
 document.addImage('image.jpg', width='20%', height='20%')
 
 document.save("test1.docx")
@@ -38,6 +49,7 @@ document = Document()
 document.addParagraph("vanuit python toegevoegd onderaan", bold=True, italic=True, underline='red', 
 					uppercase=True, color='red', font='Times New Roman')
 document.addParagraph("vanuit python toegevoegd na klaas", 'aftertext:klaas')
+
 #search and replace
 document.searchAndReplace("klaas", "jan")
 #hyperlink
@@ -64,19 +76,22 @@ document.closeTable(table)
 document.insertBreak('page')
 
 #list
-listItem = document.addList('first', type='bullet')
-listItem.addItem('piet')
-listItem.addItem('henk')
-listItem.addItem('Jan')
-listItem.addItem('Frits')
-listItem.addItem('Bert')
-document.closeList(listItem)
+numberedList = document.addList('first')
+numberedList.addItem('piet')
+numberedList.addItem('henk')
+numberedList.addItem('Jan')
+numberedList.addItem('Klaas', level=1)
+numberedList.addItem('Rene', level=1)
+numberedList.addItem('Klaas', level=2)
+numberedList.addItem('Rene', level=2)
+numberedList.addItem('Frits')
+numberedList.addItem('Bert')
+document.closeList(numberedList)
 
 #add heading
 document.addParagraph("This file is created through python for testing", 'first', 'Heading1', bold=True)
 
 #add image to end of file
 document.addImage('image.jpg', position='first', width='10%', height='10%')
-document.addImage('image.jpg', width='30%', height='30%')
-
+document.addImage('image1.jpg', width='30%', height='30%')
 document.save("test2.docx")

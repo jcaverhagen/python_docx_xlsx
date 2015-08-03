@@ -3,6 +3,10 @@
 Simple docx editor written in python.
 
 Changelog:
+##### 03-08-2015
+- Added option to have multiple levels in list (default structure file, future giving style with it)
+- Reformated code
+
 ##### 31-07-2015
 - Fixed list position and order
 - Fixed table column order
