@@ -1,6 +1,6 @@
-# python docx
+# python docx and xlsx
 
-Simple docx editor written in python.
+Simple docx and xlsx editor written in python.
 
 Changelog:
 ##### 04-08-2015
