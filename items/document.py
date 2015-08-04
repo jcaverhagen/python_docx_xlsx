@@ -294,26 +294,11 @@ class ContentTypeFile() :
 	def __init__(self, xml=None) :
 		if xml is not None :
 			self.xmlString = xml
-			
-			#add for default images extensions when not in file already TODO only when needed to add
-			for type in self.xmlString.iter() :
-				if type.tag == '{' + defaults.WPREFIXES['ct'] + '}' + 'Default' :
-					if type.attrib['Extension'] in self.imageExtensions :
-						self.imageExtensions[type.attrib['Extension']] = None
-
-			for key, value in self.imageExtensions.items() :
-				if value is not None :
-					self.xmlString.append(value)
-
 		else :
 			self.xmlString = etree.fromstring("""<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 				<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
 				<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
 				<Default Extension="xml" ContentType="application/xml"/>
-				<Default Extension="jpg" ContentType="image/jpeg"/>
-				<Default Extension="gif" ContentType="image/gif"/>
-				<Default Extension="jpeg" ContentType="image/jpeg"/>
-				<Default Extension="png" ContentType="image/png"/>
 				<Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>
 				<Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/>
 				<Override PartName="/docProps/app.xml" ContentType="application/vnd.openxmlformats-officedocument.extended-properties+xml"/>
@@ -324,6 +309,17 @@ class ContentTypeFile() :
 				<Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/>
 				<Override PartName="/word/numbering.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.numbering+xml"/>
 				</Types>""")
+
+	def addImageExtension(self, extension) :
+		alreadyExists = False
+		#check if extension already in Content_Types
+		for type in self.xmlString.iter() :
+			if type.tag == '{' + defaults.WPREFIXES['ct'] + '}' + 'Default' :
+				if type.attrib['Extension'] == extension :
+					alreadyExists = True
+
+		if alreadyExists == False :
+			self.xmlString.append(self.imageExtensions[extension])
 
 	def addOverride(self, type, filenumber) :
 		if type == 'header' :

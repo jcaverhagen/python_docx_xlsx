@@ -139,12 +139,14 @@ class Document :
             id = count
         else :
             id = len(self.images)
-            
-        imagename = 'image' + str(id) + '.jpg'
+        
+        extension = image.split('.')[1]
+        imagename = 'image' + str(id) + '.' + extension
 
         self.images[image] = imagename
 
         rel_id = self.files['word/_rels/document.xml.rels'].addRelation('image', imagename=imagename)
+        self.files['[Content_Types].xml'].addImageExtension(extension)
 
         image = Image(image, id, rel_id, width, height)
         self.doc.addElement(image.get(), position)
