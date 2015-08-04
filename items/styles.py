@@ -1,1 +1,0 @@
-PARAGRAPH_ALIGN_RIGHT = '<w:jc w:val="right"/>'

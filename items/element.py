@@ -1,22 +1,13 @@
 from lxml import etree
-
-WPREFIXES = {
-        'w' : 'http://schemas.openxmlformats.org/wordprocessingml/2006/main',
-        #relationships
-        'r': 'http://schemas.openxmlformats.org/officeDocument/2006/relationships',
-        #drawing
-        'wp' : 'http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing',
-        'a' : 'http://schemas.openxmlformats.org/drawingml/2006/main',
-        'pic' : 'http://schemas.openxmlformats.org/drawingml/2006/picture'
-    }
+import defaults
 
 class Element :
 
 	def createElement(self, tag, text=None, attr=None, prefix='w', attrprefix='') :
 		
 		if prefix :
-			etree.register_namespace(prefix, WPREFIXES[prefix])
-			element = etree.Element('{' + WPREFIXES[prefix] + '}' + tag, nsmap=None)
+			etree.register_namespace(prefix, defaults.WPREFIXES[prefix])
+			element = etree.Element('{' + defaults.WPREFIXES[prefix] + '}' + tag, nsmap=None)
 		else :
 			element = etree.Element(tag)
 
@@ -29,13 +20,13 @@ class Element :
 				#id when hyperlink (relationship)
 				if key == 'rel_id' or key == 'embed' :
 					if key == 'rel_id' :
-						element.set('{' + WPREFIXES['r'] + '}id', value)
+						element.set('{' + defaults.WPREFIXES['r'] + '}id', value)
 					else :
-						element.set('{' + WPREFIXES['r'] + '}' + key, value)
+						element.set('{' + defaults.WPREFIXES['r'] + '}' + key, value)
 				elif not attrprefix :
 					element.set(key, value)
 				else :
-					element.set('{' + WPREFIXES[attrprefix] + '}' + key, value)
+					element.set('{' + defaults.WPREFIXES[attrprefix] + '}' + key, value)
 
 		if text :
 			element.text = text

@@ -94,7 +94,7 @@ class Document :
                 doc.addElement(item, listItem.getPosition())
 
     #add header
-    def addHeader(self, text, headertype) :
+    def addHeader(self, text, headertype='default') :
         if headertype == 'first' :
             filenumber = 3
         elif headertype == 'even' :
@@ -106,6 +106,8 @@ class Document :
         doc = self.files['word/document.xml']
         rel_id = self.files['word/_rels/document.xml.rels'].addRelation('header', headerfootertype=headertype)
         self.files['word/header' + str(filenumber) + '.xml'] = HeaderFile(text, str(filenumber))
+
+        self.files['[Content_Types].xml'].addOverride('header', filenumber)
 
         doc.addReference('header', headertype, rel_id)
 
@@ -122,6 +124,8 @@ class Document :
         doc = self.files['word/document.xml']
         rel_id = self.files['word/_rels/document.xml.rels'].addRelation('footer', headerfootertype=footertype)
         self.files['word/footer' + str(filenumber) + '.xml'] = FooterFile(text, str(filenumber))
+
+        self.files['[Content_Types].xml'].addOverride('footer', filenumber)
 
         doc.addReference('footer', footertype, rel_id)
 

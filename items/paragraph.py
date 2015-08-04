@@ -1,6 +1,6 @@
 from lxml import etree
 from element import Element
-from colors import Colors
+import defaults
 
 _basic = """<w:p>
 				<w:pPr>
@@ -36,8 +36,8 @@ class Paragraph :
 		if italic is not False :
 			self._prop.append(Element().createElement('i', attr={'val' : 'true'}))
 		if underline is not False :
-			if underline in Colors().colors :
-				self._prop.append(Element().createElement('u', attr={'val' : 'single', 'color' : Colors().colors[color].replace('#', '')}))
+			if underline in defaults.colors :
+				self._prop.append(Element().createElement('u', attr={'val' : 'single', 'color' : defaults.colors[color].replace('#', '')}))
 			else :
 				if underline == True :
 					underline = '#000000'
@@ -45,14 +45,14 @@ class Paragraph :
 		if uppercase is not False :
 			self._prop.append(Element().createElement('caps', attr={'val' : 'true'}))
 		if color is not False :
-			if color in Colors().colors :
-				self._prop.append(Element().createElement('color', attr={'val' : Colors().colors[color].replace('#', '')}))
+			if color in defaults.colors :
+				self._prop.append(Element().createElement('color', attr={'val' : defaults.colors[color].replace('#', '')}))
 			else :
 				self._prop.append(Element().createElement('color', attr={'val' : color.replace('#', '')}))
 		if font is not False :
 			self._prop.append(Element().createElement('rFonts', attr={'ascii' : font, 'hAnsi' : font}))
 
-		textEl = Element().createElement('t')
+		textEl = Element().createElement('t', attr={'space' : 'preserve'})
 		textEl.text = text
 		run.append(textEl)
 		self.para.append(run)

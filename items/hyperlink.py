@@ -35,7 +35,7 @@ class Hyperlink :
 		rPr.append(style)
 		run.append(rPr)
 
-		textEl = Element().createElement('t', text=text)
+		textEl = Element().createElement('t', text=text, attr={'space' : 'preserve'})
 		run.append(textEl)
 
 		self._hyperlink.append(run)

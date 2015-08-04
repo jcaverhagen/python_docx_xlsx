@@ -3,6 +3,10 @@
 Simple docx editor written in python.
 
 Changelog:
+##### 04-08-2015
+- Fix: When making text hyperlink leave the spaces
+- Refactoring
+
 ##### 03-08-2015
 - Implemented Footers (even, odd, first and default settings)
 - Fixed search and replace for header files

@@ -1,13 +1,7 @@
 from datetime import datetime
 from element import Element
 from lxml import etree
-
-WPREFIXES = {
-        'w' : '{http://schemas.openxmlformats.org/wordprocessingml/2006/main}',
-    	#relationships
-	    'r':  'http://schemas.openxmlformats.org/officeDocument/2006/relationships',
-	    'ct' : '{http://schemas.openxmlformats.org/package/2006/content-types}'
-    }
+import defaults
 
 class RelationshipFile() :
 
@@ -46,12 +40,12 @@ class DocumentRelationshipFile() :
 	def addRelation(self, type, url=None, imagename='', headerfootertype='default') :
 		new_id = self._getHighestRelationId() + 1
 		if type == 'hyperlink' :
-			attr = {'Id' : 'rId' + str(new_id), 'Type' : WPREFIXES['r'] + '/hyperlink', 'Target' : url, 'TargetMode' : 'External'}
+			attr = {'Id' : 'rId' + str(new_id), 'Type' : defaults.WPREFIXES['r'] + '/hyperlink', 'Target' : url, 'TargetMode' : 'External'}
 			rel = Element().createElement('Relationship', prefix=None, attr=attr)
 			self._rels.append(rel)
 			
 		if type == 'image' :
-			attr = {'Id' : 'rId' + str(new_id), 'Type' : WPREFIXES['r'] + '/image', 'Target' : 'media/' + imagename}
+			attr = {'Id' : 'rId' + str(new_id), 'Type' : defaults.WPREFIXES['r'] + '/image', 'Target' : 'media/' + imagename}
 			rel = Element().createElement('Relationship', prefix=None, attr=attr)
 			self._rels.append(rel)
 		
@@ -63,7 +57,7 @@ class DocumentRelationshipFile() :
 			else :
 				file = 'header2.xml'
 
-			attr = {'Id' : 'rId' + str(new_id), 'Type' : WPREFIXES['r'] + '/header', 'Target' : file}
+			attr = {'Id' : 'rId' + str(new_id), 'Type' : defaults.WPREFIXES['r'] + '/header', 'Target' : file}
 			rel = Element().createElement('Relationship', prefix=None, attr=attr)
 			self._rels.append(rel)
 
@@ -75,7 +69,7 @@ class DocumentRelationshipFile() :
 			else :
 				file = 'footer2.xml'
 
-			attr = {'Id' : 'rId' + str(new_id), 'Type' : WPREFIXES['r'] + '/footer', 'Target' : file}
+			attr = {'Id' : 'rId' + str(new_id), 'Type' : defaults.WPREFIXES['r'] + '/footer', 'Target' : file}
 			rel = Element().createElement('Relationship', prefix=None, attr=attr)
 			self._rels.append(rel)
 
@@ -170,7 +164,7 @@ class DocumentFile :
 	#adding an element to document.xml
 	def addElement(self, element, position='last') :
 		for el in self._doc.iter() :
-			if el.tag == WPREFIXES['w'] + 'body' :
+			if el.tag == '{' + defaults.WPREFIXES['w'] + '}' + 'body' :
 				if position == 'first' : el.insert(0, element)
 				else :
 					if 'beforetext:' in position :
@@ -184,10 +178,10 @@ class DocumentFile :
 
 	def makeTextHyperlink(self, text, element) :
 		for el in self._doc.iter() :
-			if el.tag == WPREFIXES['w'] + 'p' :
+			if el.tag == '{' + defaults.WPREFIXES['w'] + '}'  + 'p' :
 				for e in el.iter() :
 					addLink = False
-					if e.tag == WPREFIXES['w'] + 't' :
+					if e.tag == '{' + defaults.WPREFIXES['w'] + '}'  + 't' :
 						if e.text :
 							if text in e.text :
 								e.text = e.text.replace(text, ' ')
@@ -198,18 +192,18 @@ class DocumentFile :
 
 	def searchAndReplace(self, regex, replacement) :
 		for el in self._doc.iter() :
-			if el.tag == WPREFIXES['w'] + 'p' :
+			if el.tag == '{' + defaults.WPREFIXES['w'] + '}'  + 'p' :
 				for e in el.iter() :
-					if e.tag == WPREFIXES['w'] + 't' :
+					if e.tag == '{' + defaults.WPREFIXES['w'] + '}'  + 't' :
 						e.text = e.text.replace(regex, replacement)
 
 	#search position of paragraph
 	def _searchParagraphPosition(self, text):
 		position = 0
 		for el in self._doc.iter() :
-			if el.tag == WPREFIXES['w'] + 'p' :
+			if el.tag == '{' + defaults.WPREFIXES['w'] + '}'  + 'p' :
 				for e in el.iter() :
-					if e.tag == WPREFIXES['w'] + 't' :
+					if e.tag == '{' + defaults.WPREFIXES['w'] + '}'  + 't' :
 						position = position + 1
 						if e.text :
 							if text in e.text :
@@ -222,12 +216,20 @@ class DocumentFile :
 		else : 
 			Reference = Element().createElement('footerReference', attr={'type' : type, 'rel_id' : 'rId' + str(id)})
 
+		added = False
 		for el in self._doc.iter() :
-			if el.tag == WPREFIXES['w'] + 'sectPr' :
-				el.append(Reference)
+			if el.tag == '{' + defaults.WPREFIXES['w'] + '}'  + 'p' :
+				for e in el.iter() :
+					if e.tag == '{' + defaults.WPREFIXES['w'] + '}' + 'pPr' :
+						for l in e.iter() :
+							if l.tag == '{' + defaults.WPREFIXES['w'] + '}'  + 'sectPr' :
+								if added == False :
+									l.append(Reference)
 
-				if type == 'first' :
-					el.append(Element().createElement('titlePg'))
+									if type == 'first' :
+										l.append(Element().createElement('titlePg'))
+									added = True
+
 
 	def getXml(self) :
 		return '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' + etree.tostring(self._doc, pretty_print=True)
@@ -247,9 +249,8 @@ class ContentTypeFile() :
 			self.xmlString = xml
 			
 			#add for default images extensions when not in file already TODO only when needed to add
-			types = self.xmlString.findall("Default")
 			for type in self.xmlString.iter() :
-				if type.tag == WPREFIXES['ct'] + 'Default' :
+				if type.tag == '{' + defaults.WPREFIXES['ct'] + '}' + 'Default' :
 					if type.attrib['Extension'] in self.imageExtensions :
 						self.imageExtensions[type.attrib['Extension']] = None
 
@@ -275,14 +276,34 @@ class ContentTypeFile() :
 				<Override PartName="/word/webSettings.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.webSettings+xml"/>
 				<Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/>
 				<Override PartName="/word/numbering.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.numbering+xml"/>
-				<Override PartName="/word/header1.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.header+xml"/>
-				<Override PartName="/word/header2.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.header+xml"/>
-				<Override PartName="/word/header3.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.header+xml"/>
-				<Override PartName="/word/footer1.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.footer+xml"/>
-				<Override PartName="/word/footer2.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.footer+xml"/>
-				<Override PartName="/word/footer3.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.footer+xml"/>
 				</Types>""")
 
+	def addOverride(self, type, filenumber) :
+		if type == 'header' :
+			PartName = 'word/header' + str(filenumber) + '.xml'
+			ContentType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.header+xml'
+
+			notInXml = True
+			for over in self.xmlString.iter() :
+				if over.tag == '{' + defaults.WPREFIXES['ct'] + '}' + 'Override' :
+					if over.attrib['PartName'] == PartName :
+						notInXml = False
+
+			if notInXml :
+				self.xmlString.append(Element().createElement('Override', attr={'PartName' : PartName, 'ContentType' : ContentType}, prefix=None, attrprefix=None))
+		elif type == 'footer' :
+			PartName = 'word/footer' + str(filenumber) + '.xml'
+			ContentType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.footer+xml'
+
+			notInXml = True
+			for over in self.xmlString.iter() :
+				if over.tag == '{' + defaults.WPREFIXES['ct'] + '}' + 'Override' :
+					if over.attrib['PartName'] == PartName :
+						notInXml = False
+
+			if notInXml :
+				self.xmlString.append(Element().createElement('Override', attr={'PartName' : PartName, 'ContentType' : ContentType}, prefix=None, attrprefix=None))
+		
 	def getXml(self) :
 		return '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' + etree.tostring(self.xmlString, pretty_print=True)
 
