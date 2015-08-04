@@ -4,6 +4,7 @@ Simple docx editor written in python.
 
 Changelog:
 ##### 04-08-2015
+- Implemented basic functionality to create xlsx files
 - Implemented hyperlinks on images
 - Refactored add image method, only add necessary image extension to [Content_Types].xml
 - Implemented anchors in document with hyperlink
