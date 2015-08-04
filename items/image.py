@@ -52,7 +52,7 @@ class Image :
 	_image = ''
 	_p = ''
 
-	def __init__(self, image, id, rel_id, width='100%', height='100%') :
+	def __init__(self, image, id, rel_id, width='100%', height='100%', url_id=None) :
 		self._image = open(image)
 		image_name =  basename(self._image.name).replace(' ', '-')
 		id = id
@@ -77,6 +77,11 @@ class Image :
 		extend = Element().createElement('extent', attr={'cy' : str(int(height)), 'cx' : str(int(width))}, prefix='wp', attrprefix=None)
 		effectExtent = Element().createElement('effectExtent', attr={'l' : '19050', 't' : '0', 'r' : '0', 'b' : '0'}, prefix='wp', attrprefix=None)
 		docPr = Element().createElement('docPr', attr={'id' : str(id), 'descr' : image_name, 'name' : 'Picture 0'}, prefix='wp', attrprefix=None)
+
+		if url_id is not None :
+			a = Element().createElement('hlinkClick', attr={'rel_id' : 'rId' + str(url_id)}, prefix='a')
+			docPr.append(a)
+
 		cNvGraphicFramePr = Element().createElement('cNvGraphicFramePr', prefix='wp')
 		graphicFrameLocks = Element().createElement('graphicFrameLocks', attr={ 'noChangeAspect' : '1'}, prefix='a', attrprefix=None) 
 		cNvGraphicFramePr.append(graphicFrameLocks)

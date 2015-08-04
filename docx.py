@@ -130,7 +130,7 @@ class Document :
 
         self.doc.addReference('footer', footertype, rel_id)
 
-    def addImage(self, image, position='last', width='100%', height='100%') :
+    def addImage(self, image, position='last', width='100%', height='100%', url=None) :
         count = 1
         if self.filename is not None :
             for path in self._doc.namelist() :
@@ -148,7 +148,11 @@ class Document :
         rel_id = self.files['word/_rels/document.xml.rels'].addRelation('image', imagename=imagename)
         self.files['[Content_Types].xml'].addImageExtension(extension)
 
-        image = Image(image, id, rel_id, width, height)
+        url_id = None
+        if url is not None :
+            url_id = self.files['word/_rels/document.xml.rels'].addRelation('hyperlink', url=url)
+
+        image = Image(image, id, rel_id, width, height, url_id)
         self.doc.addElement(image.get(), position)
 
     def insertBreak(self, type, position='last') :

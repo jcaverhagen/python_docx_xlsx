@@ -38,7 +38,7 @@ numberedList.addItem('Frits')
 numberedList.addItem('Bert')
 document.closeList(numberedList)
 
-document.addImage('image.jpg', width='20%', height='20%')
+document.addImage('image.jpg', width='20%', height='20%', url='http://www.nu.nl')
 
 document.addHeader('Header tekst eerste pagina', 'first')
 
@@ -100,7 +100,7 @@ document.addParagraph("This file is created through python for testing", 'first'
 
 #add image to end of file
 document.addImage('image.jpg', position='first', width='10%', height='10%')
-document.addImage('image1.jpg', width='30%', height='30%')
+document.addImage('image1.jpg', width='30%', height='30%', url='http://www.tweakers.net')
 
 #pagebreak
 document.insertBreak('page')

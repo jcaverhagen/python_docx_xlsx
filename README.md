@@ -4,8 +4,9 @@ Simple docx editor written in python.
 
 Changelog:
 ##### 04-08-2015
+- Implemented hyperlinks on images
 - Refactored add image method, only add necessary image extension to [Content_Types].xml
-- Implemented anchors in document
+- Implemented anchors in document with hyperlink
 - Fix: Make text hyperlink, hold the positions after adding hyperlink
 - Fix: When making text hyperlink leave the spaces
 - Refactoring
