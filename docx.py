@@ -1,12 +1,12 @@
 #!/usr/bin/python
 import zipfile
 from lxml import etree
-from items.paragraph import Paragraph, Break
-from items.hyperlink import Hyperlink
-from items.table import Table
-from items.list import List
-from items.image import Image
-from items.document import (
+from docx_items.paragraph import Paragraph, Break
+from docx_items.hyperlink import Hyperlink
+from docx_items.table import Table
+from docx_items.list import List
+from docx_items.image import Image
+from docx_items.document import (
  StyleFile, AppFile, RelationshipFile, DocumentRelationshipFile, CoreFile, DocumentFile, HeaderFile, FooterFile,
  ContentTypeFile, NumberingFile, SettingsFile, FontTableFile, StylesWithEffectsFile, WebSettingsFile, ThemeFile
 )
@@ -44,9 +44,8 @@ class Document :
         self.doc = self.files['word/document.xml']
 
     #add paragraph as first
-    def addParagraph(self, text, position='last', style='NormalWeb', bold=False, italic=False, 
-                        underline=False, uppercase=False, color=False, font=False) :
-        paragraph = Paragraph(text, style, bold, italic, underline, uppercase, color, font).get()
+    def addParagraph(self, text, position='last', style='NormalWeb', styles=None) :
+        paragraph = Paragraph(text, style, styles).get()
         self.doc.addElement(paragraph, position)
 
     #add hyperlink to document

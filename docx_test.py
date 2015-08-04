@@ -50,8 +50,8 @@ NEW DOCUMENT WITH NO INPUT FILE, CREATING FROM SCRATCH
 #creating complete file
 document = Document()
 #paragraph
-document.addParagraph("vanuit python toegevoegd onderaan", bold=True, italic=True, underline='red', 
-					uppercase=True, color='red', font='Times New Roman')
+document.addParagraph("vanuit python toegevoegd onderaan", styles={'bold' : True, 'italic' : True, 'underline' : 'red', 
+					'uppercase' : True, 'color' : 'red', 'font' : 'Times New Roman'})
 document.addParagraph("vanuit python toegevoegd na klaas", 'aftertext:klaas')
 
 #search and replace
@@ -96,7 +96,7 @@ numberedList.addItem('Bert')
 document.closeList(numberedList)
 
 #add heading
-document.addParagraph("This file is created through python for testing", 'first', 'Heading1', bold=True)
+document.addParagraph("This file is created through python for testing", 'first', 'Heading1', styles={'bold' : True})
 
 #add image to end of file
 document.addImage('image.jpg', position='first', width='10%', height='10%')
@@ -104,8 +104,8 @@ document.addImage('image1.jpg', width='30%', height='30%', url='http://www.tweak
 
 #pagebreak
 document.insertBreak('page')
-document.addParagraph("vanuit python toegevoegd onderaan", bold=True, italic=True, underline='red', 
-					uppercase=True, color='red', font='Times New Roman')
+document.addParagraph("vanuit python toegevoegd onderaan", styles={'bold' : True, 'italic' : True, 'underline' : 'red', 
+					'uppercase' : True, 'color' : 'red', 'font' : 'Times New Roman'})
 
 # adding headers
 document.addHeader('Header tekst even pages', 'even')

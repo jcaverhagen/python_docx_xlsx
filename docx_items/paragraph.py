@@ -16,8 +16,21 @@ class Paragraph :
 	
 	_prop = ''
 	
-	def __init__(self, text='', style='NormalWeb', bold=False, italic=False, underline=False, 
-					uppercase=False, color=False, font=False) :
+	def __init__(self, text='', style='NormalWeb', styles=None) :
+	
+		self._styles = {
+			'bold' : False,
+			'italic' : False,
+			'underline' : False,
+			'uppercase' : False,
+			'color' : False,
+			'font' : False
+		}
+
+		if styles is not None :
+			for key, value in styles.items() :
+				self._styles[key] = value
+
 		#root element
 		self.para = Element().createElement('p')
 		
@@ -30,33 +43,37 @@ class Paragraph :
 		run = Element().createElement('r')
 		self._prop = Element().createElement('rPr')
 		run.append(self._prop)
-		
-		if bold is not False :
-			self._prop.append(Element().createElement('b', attr={'val' : 'true'}))
-		if italic is not False :
-			self._prop.append(Element().createElement('i', attr={'val' : 'true'}))
-		if underline is not False :
-			if underline in defaults.colors :
-				self._prop.append(Element().createElement('u', attr={'val' : 'single', 'color' : defaults.colors[color].replace('#', '')}))
-			else :
-				if underline == True :
-					underline = '#000000'
-				self._prop.append(Element().createElement('u', attr={'val' : 'single', 'color' : underline.replace('#', '')}))
-		if uppercase is not False :
-			self._prop.append(Element().createElement('caps', attr={'val' : 'true'}))
-		if color is not False :
-			if color in defaults.colors :
-				self._prop.append(Element().createElement('color', attr={'val' : defaults.colors[color].replace('#', '')}))
-			else :
-				self._prop.append(Element().createElement('color', attr={'val' : color.replace('#', '')}))
-		if font is not False :
-			self._prop.append(Element().createElement('rFonts', attr={'ascii' : font, 'hAnsi' : font}))
 
+		#set styles
+		self.setStyles()
+		
 		textEl = Element().createElement('t', attr={'space' : 'preserve'})
 		textEl.text = text
 		run.append(textEl)
 		self.para.append(run)
 	
+	def setStyles(self) :
+		if self._styles['bold'] is not False :
+			self._prop.append(Element().createElement('b', attr={'val' : 'true'}))
+		if self._styles['italic'] is not False :
+			self._prop.append(Element().createElement('i', attr={'val' : 'true'}))
+		if self._styles['underline'] is not False :
+			if self._styles['underline'] in defaults.colors :
+				self._prop.append(Element().createElement('u', attr={'val' : 'single', 'color' : defaults.colors[self._styles['color']].replace('#', '')}))
+			else :
+				if self._styles['underline'] == True :
+					underline = '#000000'
+				self._prop.append(Element().createElement('u', attr={'val' : 'single', 'color' : underline.replace('#', '')}))
+		if self._styles['uppercase'] is not False :
+			self._prop.append(Element().createElement('caps', attr={'val' : 'true'}))
+		if self._styles['color'] is not False :
+			if self._styles['color'] in defaults.colors :
+				self._prop.append(Element().createElement('color', attr={'val' : defaults.colors[self._styles['color']].replace('#', '')}))
+			else :
+				self._prop.append(Element().createElement('color', attr={'val' : self._styles['color'].replace('#', '')}))
+		if self._styles['font'] is not False :
+			self._prop.append(Element().createElement('rFonts', attr={'ascii' : self._styles['font'], 'hAnsi' : self._styles['font']}))
+
 	def get(self) :
 		return self.para
 
