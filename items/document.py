@@ -169,10 +169,10 @@ class DocumentFile :
 				else :
 					if 'beforetext:' in position :
 						position = self._searchParagraphPosition(position.replace('aftertext:', ''))
-						el.insert(position-1, element)
+						el.insert(position, element)
 					elif 'aftertext:' in position :
 						position = self._searchParagraphPosition(position.replace('aftertext:', ''))
-						el.insert(position, element)
+						el.insert(position + 1, element)
 					else :
 						el.append(element)
 
@@ -189,19 +189,55 @@ class DocumentFile :
 								e.text = splittedText[0]
 								addLink = True
 
-					if addLink :
-						el.append(element)
-						count = 0
-						for newRun in splittedText :
-							if count > 0 :
-								run = Element().createElement('r')
-								textEl = Element().createElement('t', attr={'space' : 'preserve'}, attrprefix='ns')
-								textEl.text = newRun
-								run.append(textEl)
+				if addLink :
+					el.append(element)
+					
+					run = Element().createElement('r')
+					textEl = Element().createElement('t', attr={'space' : 'preserve'}, attrprefix='ns')
+					textEl.text = splittedText[1]
+					run.append(textEl)
 
-								el.append(run)
-							count = count + 1
-				if addLink : break
+					el.append(run)
+					break
+
+	def addAnchorToText(self, text, anchor) :
+		addBookmark = False
+		for el in self._doc.iter() :
+			if el.tag == '{' + defaults.WPREFIXES['w'] + '}'  + 'p' :
+				for e in el.iter() :
+					if e.tag == '{' + defaults.WPREFIXES['w'] + '}'  + 't' :
+						if e.text :
+							if text in e.text :
+								splittedText = e.text.split(text)
+								e.set('{' + defaults.WPREFIXES['ns'] + '}space', 'preserve')
+								e.text = splittedText[0]
+								addBookmark = True
+
+				if addBookmark :
+					#create bookmark elements
+					bookmarkStart = Element().createElement('bookmarkStart', attr={'id' : '0', 'name' : anchor})
+					bookmarkEnd = Element().createElement('bookmarkEnd', attr={'id' : '0'})
+
+					#add start of bookmark
+					el.append(bookmarkStart)
+
+					#create run with bookmark text
+					run = Element().createElement('r')
+					textEl = Element().createElement('t', attr={'space' : 'preserve'}, attrprefix='ns')
+					textEl.text = text
+					run.append(textEl)
+					el.append(run)
+
+					#add end of bookmark
+					el.append(bookmarkEnd)
+
+					#create run with bookmark text
+					run = Element().createElement('r')
+					textEl = Element().createElement('t', attr={'space' : 'preserve'}, attrprefix='ns')
+					textEl.text = splittedText[1]
+					run.append(textEl)
+					el.append(run)
+					break
 
 	def searchAndReplace(self, regex, replacement) :
 		for el in self._doc.iter() :
@@ -231,17 +267,15 @@ class DocumentFile :
 
 		added = False
 		for el in self._doc.iter() :
-			if el.tag == '{' + defaults.WPREFIXES['w'] + '}'  + 'p' :
-				for e in el.iter() :
-					if e.tag == '{' + defaults.WPREFIXES['w'] + '}' + 'pPr' :
-						for l in e.iter() :
-							if l.tag == '{' + defaults.WPREFIXES['w'] + '}'  + 'sectPr' :
-								if added == False :
-									l.append(Reference)
-
-									if type == 'first' :
-										l.append(Element().createElement('titlePg'))
-									added = True
+			if el.tag == '{' + defaults.WPREFIXES['w'] + '}'  + 'body' :
+				for l in el.iter() :
+					if l.tag == '{' + defaults.WPREFIXES['w'] + '}'  + 'sectPr' :
+						if added == False :
+							l.append(Reference)
+		
+							if type == 'first' :
+								l.append(Element().createElement('titlePg'))
+							added = True
 
 
 	def getXml(self) :
@@ -293,7 +327,7 @@ class ContentTypeFile() :
 
 	def addOverride(self, type, filenumber) :
 		if type == 'header' :
-			PartName = 'word/header' + str(filenumber) + '.xml'
+			PartName = '/word/header' + str(filenumber) + '.xml'
 			ContentType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.header+xml'
 
 			notInXml = True
@@ -305,7 +339,7 @@ class ContentTypeFile() :
 			if notInXml :
 				self.xmlString.append(Element().createElement('Override', attr={'PartName' : PartName, 'ContentType' : ContentType}, prefix=None, attrprefix=None))
 		elif type == 'footer' :
-			PartName = 'word/footer' + str(filenumber) + '.xml'
+			PartName = '/word/footer' + str(filenumber) + '.xml'
 			ContentType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.footer+xml'
 
 			notInXml = True

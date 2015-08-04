@@ -22,11 +22,14 @@ class Hyperlink :
 	_rel_id = ''
 	_url = ''
 
-	def __init__(self, text, rel_id, url) :
+	def __init__(self, text, rel_id, url, anchor=None) :
 		self._rel_id = rel_id
 		self._url = url
 
-		self._hyperlink = Element().createElement('hyperlink', attr={'rel_id' : 'rId' + rel_id})
+		if anchor is None :
+			self._hyperlink = Element().createElement('hyperlink', attr={'rel_id' : 'rId' + rel_id})
+		else :
+			self._hyperlink = Element().createElement('hyperlink', attr={'anchor' : anchor})
 		
 		run = Element().createElement('r')
 		

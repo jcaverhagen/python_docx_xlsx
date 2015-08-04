@@ -50,21 +50,28 @@ class Document :
         self.doc.addElement(paragraph, position)
 
     #add hyperlink to document
-    def addHyperlink(self, text, url, position='last') :
-        rel_id = self.files['word/_rels/document.xml.rels'].addRelation('hyperlink', url)
+    def addHyperlink(self, text, url, position='last', anchor=None) :
+        rel_id = 0
+        if anchor == None :
+            rel_id = self.files['word/_rels/document.xml.rels'].addRelation('hyperlink', url)
 
         paraElement = Paragraph().get()
-        hyperlink = Hyperlink(text, str(rel_id), url)
+        hyperlink = Hyperlink(text, str(rel_id), url, anchor)
         paraElement.append(hyperlink.get())
 
         self.doc.addElement(paraElement, position)
 
     #method to make specific test an hyperlink
-    def makeTextHyperlink(self, text, url) :
-        rel_id = self.files['word/_rels/document.xml.rels'].addRelation('hyperlink', url=url)
+    def makeTextHyperlink(self, text, url, anchor=None) :
+        rel_id = 0
+        if anchor == None :
+            rel_id = self.files['word/_rels/document.xml.rels'].addRelation('hyperlink', url=url)
 
-        hyperlink = Hyperlink(text, str(rel_id), url)
+        hyperlink = Hyperlink(text, str(rel_id), url, anchor)
+        
         self.doc.makeTextHyperlink(text, hyperlink.get())
+        if anchor != None :
+            self.doc.addAnchorToText(url, anchor)
 
     #init an new table and returning it to caller
     def addTable(self, width, columns, position='last') :
