@@ -4,6 +4,7 @@ Simple docx editor written in python.
 
 Changelog:
 ##### 04-08-2015
+- Fix: Make text hyperlink in the middle of sentece, split text and hold the positions after adding hyperlink
 - Fix: When making text hyperlink leave the spaces
 - Refactoring
 

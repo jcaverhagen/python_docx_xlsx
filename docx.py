@@ -15,7 +15,6 @@ from PIL import Image as PILImage
 class Document :
     
     def __init__(self, filename=None) :
-        self._doc = ''
         self.files = {}
         self.images = {}
         self.filename = filename
@@ -42,31 +41,30 @@ class Document :
             self.files['[Content_Types].xml'] = ContentTypeFile()
             self.files['word/settings.xml'] = SettingsFile()
 
+        self.doc = self.files['word/document.xml']
+
     #add paragraph as first
     def addParagraph(self, text, position='last', style='NormalWeb', bold=False, italic=False, 
                         underline=False, uppercase=False, color=False, font=False) :
-        doc = self.files['word/document.xml']
         paragraph = Paragraph(text, style, bold, italic, underline, uppercase, color, font).get()
-        doc.addElement(paragraph, position)
+        self.doc.addElement(paragraph, position)
 
     #add hyperlink to document
     def addHyperlink(self, text, url, position='last') :
-        doc = self.files['word/document.xml']
         rel_id = self.files['word/_rels/document.xml.rels'].addRelation('hyperlink', url)
 
         paraElement = Paragraph().get()
         hyperlink = Hyperlink(text, str(rel_id), url)
         paraElement.append(hyperlink.get())
 
-        doc.addElement(paraElement, position)
+        self.doc.addElement(paraElement, position)
 
     #method to make specific test an hyperlink
     def makeTextHyperlink(self, text, url) :
-        doc = self.files['word/document.xml']
         rel_id = self.files['word/_rels/document.xml.rels'].addRelation('hyperlink', url=url)
 
         hyperlink = Hyperlink(text, str(rel_id), url)
-        doc.makeTextHyperlink(text, hyperlink.get())
+        self.doc.makeTextHyperlink(text, hyperlink.get())
 
     #init an new table and returning it to caller
     def addTable(self, width, columns, position='last') :
@@ -74,8 +72,7 @@ class Document :
 
     #close table and add it to document
     def closeTable(self, table) :
-        doc = self.files['word/document.xml']
-        doc.addElement(table.get(), table.getPosition())
+        self.doc.addElement(table.get(), table.getPosition())
 
     #init an new list and return object to caller
     def addList(self, position='last') :
@@ -83,15 +80,14 @@ class Document :
         
     #close list and inserting it in document
     def closeList(self, listItem) :
-        doc = self.files['word/document.xml']
         listItems = listItem.get()
         
         if listItem.getPosition() == 'first' :
              for item in reversed(listItems) :
-                doc.addElement(item, listItem.getPosition())
+                self.doc.addElement(item, listItem.getPosition())
         else :
             for item in listItems :
-                doc.addElement(item, listItem.getPosition())
+                self.doc.addElement(item, listItem.getPosition())
 
     #add header
     def addHeader(self, text, headertype='default') :
@@ -103,13 +99,12 @@ class Document :
         else :
             filenumber = 2
 
-        doc = self.files['word/document.xml']
         rel_id = self.files['word/_rels/document.xml.rels'].addRelation('header', headerfootertype=headertype)
         self.files['word/header' + str(filenumber) + '.xml'] = HeaderFile(text, str(filenumber))
 
         self.files['[Content_Types].xml'].addOverride('header', filenumber)
 
-        doc.addReference('header', headertype, rel_id)
+        self.doc.addReference('header', headertype, rel_id)
 
     #add footer
     def addFooter(self, text, footertype) :
@@ -121,17 +116,14 @@ class Document :
         else :
             filenumber = 2
 
-        doc = self.files['word/document.xml']
         rel_id = self.files['word/_rels/document.xml.rels'].addRelation('footer', headerfootertype=footertype)
         self.files['word/footer' + str(filenumber) + '.xml'] = FooterFile(text, str(filenumber))
 
         self.files['[Content_Types].xml'].addOverride('footer', filenumber)
 
-        doc.addReference('footer', footertype, rel_id)
+        self.doc.addReference('footer', footertype, rel_id)
 
     def addImage(self, image, position='last', width='100%', height='100%') :
-        doc = self.files['word/document.xml']
-
         count = 1
         if self.filename is not None :
             for path in self._doc.namelist() :
@@ -148,12 +140,11 @@ class Document :
         rel_id = self.files['word/_rels/document.xml.rels'].addRelation('image', imagename=imagename)
 
         image = Image(image, id, rel_id, width, height)
-        doc.addElement(image.get(), position)
+        self.doc.addElement(image.get(), position)
 
     def insertBreak(self, type, position='last') :
-        doc = self.files['word/document.xml']
         breakEl = Break(type)
-        doc.addElement(breakEl.get(), position)
+        self.doc.addElement(breakEl.get(), position)
 
     #save document with new values
     def save(self, filename) :
@@ -176,7 +167,7 @@ class Document :
                 if path not in self.files :
                     if path == 'word/styles.xml' :
                         styleFile = etree.fromstring(StyleFile().getXml())
-                        docxFile.writestr('word/styles.xml', etree.tostring(styleFile, pretty_print=True))
+                        docxFile.writestr('word/styles.xml', etree.tostring(styleFile))
                     else : docxFile = self.copyToXML(docxFile, path)
 
         #add files from file list to docx
