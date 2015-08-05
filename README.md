@@ -4,6 +4,7 @@ Simple docx and xlsx editor written in python.
 
 Changelog:
 ##### 05-08-2015
+- Implemented adding data to sheet per column, types numbers and text
 - Implemented adding work sheets to xlsx file
 - Moved classes from docx_items to universal folder, element and default prefixes
 

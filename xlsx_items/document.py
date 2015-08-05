@@ -200,9 +200,14 @@ class WorkbookFile :
 class SheetFile :
 	path = 'xl/worksheets/sheet{num}.xml'
 
+	types = {
+		'number' : 'n',
+		'text' : 'inlineStr'
+	}
+
 	def __init__(self, num) :
 		self.path = self.path.format(num=num)
-		self.xmlString = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+		self.xmlString = etree.fromstring("""<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 			<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
 			<dimension ref="A1"/>
 			<sheetViews>
@@ -211,13 +216,51 @@ class SheetFile :
 			<sheetFormatPr defaultRowHeight="15"/>
 			<sheetData/>
 			<pageMargins left="0.7" right="0.7" top="0.75" bottom="0.75" header="0.3" footer="0.3"/>
-			</worksheet>"""
+			</worksheet>""")
+
+	def addData(self, column, value, type='number') :
+		for elem in self.xmlString.iter() :
+			if elem.tag == '{' + defaults.WPREFIXES['e'] + '}sheetData' :
+				#get row number
+				for rowNum in column :
+					if rowNum.isdigit() :
+						rowAlreadyExists = False
+						#check if row already in file
+						for item in self.xmlString.iter() :
+							if item.tag == '{' + defaults.WPREFIXES['e'] + '}' + 'row' :
+								if item.attrib['r'] == rowNum :
+									rowAlreadyExists = True
+									row = item
+
+						if rowAlreadyExists == False :
+							row = Element().createElement('row', attr={'r' : str(rowNum)}, prefix='e', attrprefix=None)
+						
+						if type not in self.types :
+							type = 'number'
+						c = Element().createElement('c', attr={'r' : column, 't' : self.types[type]}, prefix='e', attrprefix=None)
+						
+						if type == 'number' :
+							v = Element().createElement('v', prefix=None)
+							v.text = value
+							c.append(v)
+						
+						if type == 'text' :
+							isEl = Element().createElement('is', prefix='e')
+							tEl = Element().createElement('t', prefix='e')
+							tEl.text = value
+							isEl.append(tEl)
+							c.append(isEl)
+
+						#row.set('spans', '1:4')
+
+						row.append(c)
+						elem.append(row)
 
 	def getPath(self) :
 		return self.path
 
 	def getXml(self) :
-		return self.xmlString
+		return etree.tostring(self.xmlString, pretty_print=True)
 
 class ThemeFile :
 	path = 'xl/theme/theme1.xml'
