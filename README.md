@@ -3,6 +3,10 @@
 Simple docx and xlsx editor written in python.
 
 Changelog:
+##### 05-08-2015
+- Implemented adding work sheets to xlsx file
+- Moved classes from docx_items to universal folder, element and default prefixes
+
 ##### 04-08-2015
 - Implemented basic functionality to create xlsx files
 - Implemented hyperlinks on images

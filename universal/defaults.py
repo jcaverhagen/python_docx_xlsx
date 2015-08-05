@@ -9,7 +9,10 @@ WPREFIXES = {
         'pic' : 'http://schemas.openxmlformats.org/drawingml/2006/picture',
         #content types
         'ct' : 'http://schemas.openxmlformats.org/package/2006/content-types',
-        'ns' : 'http://www.w3.org/XML/1998/namespace'
+        'ns' : 'http://www.w3.org/XML/1998/namespace',
+
+        #xlsx prefixes:
+        'e' : 'http://schemas.openxmlformats.org/spreadsheetml/2006/main'
     }
 
 colors = {

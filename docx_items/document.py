@@ -1,7 +1,7 @@
 from datetime import datetime
-from element import Element
+from ..universal.element import Element
 from lxml import etree
-import defaults
+import ..universal.defaults
 
 class RelationshipFile() :
 
@@ -164,7 +164,7 @@ class DocumentFile :
 	#adding an element to document.xml
 	def addElement(self, element, position='last') :
 		for el in self._doc.iter() :
-			if el.tag == '{' + defaults.WPREFIXES['w'] + '}' + 'body' :
+			if el.tag == '{' + defaults.WPREFIXES['w'] + '}body' :
 				if position == 'first' : el.insert(0, element)
 				else :
 					if 'beforetext:' in position :

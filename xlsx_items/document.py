@@ -1,6 +1,7 @@
 from datetime import datetime
-#from element import Element
+from universal.element import Element
 from lxml import etree
+from universal import defaults
 
 class ContentTypeFile :
 	path = '[Content_Types].xml'
@@ -14,10 +15,16 @@ class ContentTypeFile :
 			<Default Extension="xml" ContentType="application/xml"/>
 			<Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>
 			<Override PartName="/docProps/app.xml" ContentType="application/vnd.openxmlformats-officedocument.extended-properties+xml"/>
-			<Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>
 			<Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/>
 			</Types>""")
 
+	def addOverride(self, type, filenumber) :
+		if type == 'sheet' :
+			PartName = '/x1/worksheets/sheet' + str(filenumber) + '.xml'
+			ContentType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml'
+
+			self.xmlString.append(Element().createElement('Override', attr={'PartName' : PartName, 'ContentType' : ContentType}, prefix=None, attrprefix=None))
+				
 	def getXml(self) :
 		return etree.tostring(self.xmlString, pretty_print=True)
 
@@ -39,17 +46,32 @@ class DocumentRelationshipFile :
 	path = 'xl/_rels/workbook.xml.rels'
 
 	def __init__(self) :
-		self.xmlString = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+		self.xmlString = etree.fromstring("""<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 			<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
-			<Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet3.xml"/>
-			<Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet2.xml"/>
-			<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/>
-			<Relationship Id="rId5" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>
-			<Relationship Id="rId4" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/theme" Target="theme/theme1.xml"/>
-			</Relationships>"""
+			<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>
+			<Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/theme" Target="theme/theme1.xml"/>
+			</Relationships>""")
+
+	def addRelation(self, type, sheetId=None) :
+		new_id = self._getHighestRelationId() + 1
+		if type == 'sheet' :
+			attr = {'Id' : 'rId' + str(new_id), 'Type' : defaults.WPREFIXES['r'] + '/worksheet', 'Target' : 'worksheets/sheet' + str(sheetId) + '.xml'}
+			rel = Element().createElement('Relationship', prefix=None, attr=attr)
+			self.xmlString.append(rel)
+			
+		return new_id
+
+	#search for highest id in relations xml
+	def _getHighestRelationId(self) :
+		highest = 0
+		for rel in self.xmlString :
+			if int(rel.attrib['Id'].replace('rId', '')) > highest :
+				highest = int(rel.attrib['Id'].replace('rId', ''))
+
+		return highest
 
 	def getXml(self) :
-		return self.xmlString
+		return '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' + etree.tostring(self.xmlString, pretty_print=True)
 
 class AppFile :
 	path = 'docProps/app.xml'
@@ -153,7 +175,7 @@ class WorkbookFile :
 	path = 'xl/workbook.xml'
 
 	def __init__(self) :
-		self.xmlString = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+		self.xmlString = etree.fromstring("""<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 			<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
 			<fileVersion appName="xl" lastEdited="4" lowestEdited="4" rupBuild="4507"/>
 			<workbookPr defaultThemeVersion="124226"/>
@@ -161,13 +183,19 @@ class WorkbookFile :
 			<workbookView xWindow="0" yWindow="90" windowWidth="28755" windowHeight="12585"/>
 			</bookViews>
 			<sheets>
-			<sheet name="Sheet1" sheetId="1" r:id="rId1"/>
 			</sheets>
 			<calcPr calcId="125725"/>
-			</workbook>"""
+			</workbook>""")
+
+	def addSheet(self, filenumber, rel_id) :
+		sheetName = 'Sheet' + str(filenumber)
+
+		for elem in self.xmlString.iter() :
+			if elem.tag == '{' + defaults.WPREFIXES['e'] + '}sheets' :
+				elem.append(Element().createElement('sheet', attr={'name' : sheetName, 'sheetId' : str(filenumber), 'rel_id' : 'rId' + str(rel_id)}, prefix='e', attrprefix=None))
 
 	def getXml(self) :
-		return self.xmlString
+		return etree.tostring(self.xmlString, pretty_print=True)
 
 class SheetFile :
 	path = 'xl/worksheets/sheet{num}.xml'
