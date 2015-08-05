@@ -202,7 +202,8 @@ class SheetFile :
 
 	types = {
 		'number' : 'n',
-		'text' : 'inlineStr'
+		'text' : 'inlineStr',
+		'formule' : 'str'
 	}
 
 	def __init__(self, num) :
@@ -251,7 +252,10 @@ class SheetFile :
 							isEl.append(tEl)
 							c.append(isEl)
 
-						#row.set('spans', '1:4')
+						if type == 'formule' :
+							f = Element().createElement('f', prefix='e')
+							f.text = value
+							c.append(f)
 
 						row.append(c)
 						elem.append(row)
