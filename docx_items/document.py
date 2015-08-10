@@ -436,28 +436,45 @@ class FooterFile :
 
 	path = 'word/footer{filenumber}.xml'
 	
-	def __init__(self, text, filenumber) :
+	def __init__(self, path, xml=None) :
 
-		self.path = self.path.format(filenumber=filenumber)
-		self.text = text
+		self.path = path
+		
+		if xml is not None :
+			self.xmlString = xml
+		else :
+			self.xmlString = etree.fromstring("""<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+				<w:ftr xmlns:ve="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" xmlns:w10="urn:schemas-microsoft-com:office:word" xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:wne="http://schemas.microsoft.com/office/word/2006/wordml">
+				</w:ftr>""")
+				
+	def addText(self, text) :
+		p = Element().createElement('p')
+		pPr = Element().createElement('pPr')
+		pStyle = Element().createElement('pStyle', attr={'val' : 'Footer'})
+		pPr.append(pStyle)
+		r = Element().createElement('r')
+		t = Element().createElement('t')
+		t.text = text
+		r.append(t)
 
-		self.xmlString = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-			<w:ftr xmlns:ve="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" xmlns:w10="urn:schemas-microsoft-com:office:word" xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:wne="http://schemas.microsoft.com/office/word/2006/wordml">
-			<w:p>
-			<w:pPr>
-			<w:pStyle w:val="Footer"/>
-			</w:pPr>
-			<w:r>
-			<w:t>{text}</w:t>
-			</w:r>
-			</w:p>
-			</w:ftr>"""
+		p.append(pPr)
+		p.append(r)
+		
+		self.xmlString.append(p)
 
 	def searchAndReplace(self, regex, replacement) :
-		self.text = self.text.replace(regex, replacement)
+		for elem in self.xmlString.iter() :
+			paragraph = ''
+			if elem.tag == '{' + defaults.WPREFIXES['w'] + '}p' :
+				for el in elem.iter() :
+					if el.tag == '{' + defaults.WPREFIXES['w'] + '}t' :
+						paragraph = paragraph + el.text
+				if paragraph != '' :
+					self.xmlString.remove(elem)
+					self.addText(paragraph.replace(regex, replacement))
 
 	def getXml(self) :
-		return self.xmlString.format(text=self.text)
+		return etree.tostring(self.xmlString, pretty_print=True)
 
 class FontTableFile() :
 
