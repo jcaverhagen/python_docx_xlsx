@@ -35,6 +35,9 @@ class Document :
                     self.files[path] = ContentTypeFile(etree.fromstring(self._doc.read(path)))
                 if path == 'word/settings.xml' :
                     self.files[path] = SettingsFile(etree.fromstring(self._doc.read(path)))
+                
+                if 'footer' in path :
+                    self.files[path] = FooterFile(path, etree.fromstring(self._doc.read(path)))
         else :
             self.files['word/document.xml'] = DocumentFile()
             self.files['word/_rels/document.xml.rels'] = DocumentRelationshipFile()
@@ -113,7 +116,7 @@ class Document :
         self.doc.addReference('header', headertype, rel_id)
 
     #add footer
-    def addFooter(self, text, footertype) :
+    def addFooter(self, text, footertype='Default') :
         if footertype == 'first' :
             filenumber = 3
         elif footertype == 'even' :
@@ -123,11 +126,15 @@ class Document :
             filenumber = 2
 
         rel_id = self.files['word/_rels/document.xml.rels'].addRelation('footer', headerfootertype=footertype)
-        self.files['word/footer' + str(filenumber) + '.xml'] = FooterFile(text, str(filenumber))
+        self.files['word/footer' + str(filenumber) + '.xml'] = FooterFile(str(filenumber))
 
         self.files['[Content_Types].xml'].addOverride('footer', filenumber)
 
         self.doc.addReference('footer', footertype, rel_id)
+
+        self.files['word/footer' + str(filenumber) + '.xml'].addText(text) 
+
+        return self.files['word/footer' + str(filenumber) + '.xml']
 
     def addImage(self, image, position='last', width='100%', height='100%', url=None) :
         count = 1
