@@ -69,9 +69,16 @@ class DocumentRelationshipFile() :
 			else :
 				file = 'footer2.xml'
 
-			attr = {'Id' : 'rId' + str(new_id), 'Type' : defaults.WPREFIXES['r'] + '/footer', 'Target' : file}
-			rel = Element().createElement('Relationship', prefix=None, attr=attr)
-			self._rels.append(rel)
+			alreadyInList = False
+			for elem in self._rels :
+				if elem.attrib['Target'] == file :
+					alreadyInList = True
+					new_id = 0
+
+			if alreadyInList == False :
+				attr = {'Id' : 'rId' + str(new_id), 'Type' : defaults.WPREFIXES['r'] + '/footer', 'Target' : file}
+				rel = Element().createElement('Relationship', prefix=None, attr=attr)
+				self._rels.append(rel)
 
 		return new_id
 
@@ -265,17 +272,21 @@ class DocumentFile :
 		else : 
 			Reference = Element().createElement('footerReference', attr={'type' : type, 'rel_id' : 'rId' + str(id)})
 
-		added = False
+		toAdd = True
 		for el in self._doc.iter() :
 			if el.tag == '{' + defaults.WPREFIXES['w'] + '}'  + 'body' :
 				for l in el.iter() :
 					if l.tag == '{' + defaults.WPREFIXES['w'] + '}'  + 'sectPr' :
-						if added == False :
+						for e in l.iter() :
+							if e.tag == '{' + defaults.WPREFIXES['w'] + '}footerReference' :
+								if e.attrib['{' + defaults.WPREFIXES['w'] + '}'  + 'type'].lower() == type.lower() :
+									toAdd = False
+						if toAdd :
 							l.append(Reference)
 		
 							if type == 'first' :
 								l.append(Element().createElement('titlePg'))
-							added = True
+							added = False
 
 
 	def getXml(self) :
