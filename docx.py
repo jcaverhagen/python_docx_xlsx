@@ -126,11 +126,11 @@ class Document :
             filenumber = 2
 
         rel_id = self.files['word/_rels/document.xml.rels'].addRelation('footer', headerfootertype=footertype)
+        if rel_id > 0 :
+            self.doc.addReference('footer', footertype, rel_id)
         self.files['word/footer' + str(filenumber) + '.xml'] = FooterFile(str(filenumber))
 
         self.files['[Content_Types].xml'].addOverride('footer', filenumber)
-
-        self.doc.addReference('footer', footertype, rel_id)
 
         self.files['word/footer' + str(filenumber) + '.xml'].addText(text) 
 
