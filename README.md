@@ -4,6 +4,7 @@ Simple docx and xlsx editor written in python.
 
 Changelog:
 ##### 10-08-2015
+- Fix: double reference when adding footer[].xml
 - Improved search and replace function in FooterFile
 
 ##### 05-08-2015
