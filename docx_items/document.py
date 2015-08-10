@@ -1,7 +1,7 @@
 from datetime import datetime
-from ..universal.element import Element
+from universal.element import Element
 from lxml import etree
-import ..universal.defaults
+from universal import defaults
 
 class RelationshipFile() :
 
@@ -409,7 +409,7 @@ class HeaderFile :
 
 	path = 'word/header{filenumber}.xml'
 	
-	def __init__(self, text, filenumber) :
+	def __init__(self, text, filenumber, xml=None) :
 
 		self.path = self.path.format(filenumber=filenumber)
 		self.text = text
@@ -435,18 +435,18 @@ class HeaderFile :
 class FooterFile :
 
 	path = 'word/footer{filenumber}.xml'
-	
+
 	def __init__(self, path, xml=None) :
 
 		self.path = path
-		
+
 		if xml is not None :
 			self.xmlString = xml
 		else :
 			self.xmlString = etree.fromstring("""<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 				<w:ftr xmlns:ve="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" xmlns:w10="urn:schemas-microsoft-com:office:word" xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:wne="http://schemas.microsoft.com/office/word/2006/wordml">
 				</w:ftr>""")
-				
+
 	def addText(self, text) :
 		p = Element().createElement('p')
 		pPr = Element().createElement('pPr')
@@ -461,7 +461,7 @@ class FooterFile :
 		p.append(r)
 		
 		self.xmlString.append(p)
-
+		
 	def searchAndReplace(self, regex, replacement) :
 		for elem in self.xmlString.iter() :
 			paragraph = ''
