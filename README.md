@@ -3,6 +3,9 @@
 Simple docx and xlsx editor written in python.
 
 Changelog:
+##### 10-08-2015
+- Improved search and replace function in FooterFile
+
 ##### 05-08-2015
 - Implemented method to add formules to column
 - Implemented adding data to sheet per column, types numbers and text
