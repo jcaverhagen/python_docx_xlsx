@@ -463,7 +463,6 @@ class HeaderFile :
 		for elem in _tempXmlString.iter() :
 			paragraph = ''
 			if elem.tag == '{' + defaults.WPREFIXES['w'] + '}p' :
-				print elem.attrib
 				for el in elem.iter() :
 					if el.tag == '{' + defaults.WPREFIXES['w'] + '}t' :
 						paragraph = paragraph + el.text
