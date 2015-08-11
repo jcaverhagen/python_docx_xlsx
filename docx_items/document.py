@@ -159,11 +159,7 @@ class DocumentFile :
 	path = 'word/document.xml'
 	_doc = ''
 
-	def __init__(self, xml=None) :
-		if xml is not None :
-			self._doc = xml
-		else :
-			self._doc = etree.fromstring("""<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+	_defaultDocument = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 				<w:document xmlns:ve="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" xmlns:w10="urn:schemas-microsoft-com:office:word" xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:wne="http://schemas.microsoft.com/office/word/2006/wordml">
 				<w:body>
 					<w:sectPr>
@@ -173,7 +169,13 @@ class DocumentFile :
 						<w:docGrid w:linePitch="360"/>
 					</w:sectPr>
 				</w:body>
-				</w:document>""")
+				</w:document>"""
+
+	def __init__(self, xml=None) :
+		if xml is not None :
+			self._doc = xml
+		else :
+			self._doc = etree.fromstring(self._defaultDocument)
 
 	#adding an element to document.xml
 	def addElement(self, element, position='last') :
@@ -254,11 +256,33 @@ class DocumentFile :
 					break
 
 	def searchAndReplace(self, regex, replacement) :
-		for el in self._doc.iter() :
-			if el.tag == '{' + defaults.WPREFIXES['w'] + '}'  + 'p' :
-				for e in el.iter() :
-					if e.tag == '{' + defaults.WPREFIXES['w'] + '}'  + 't' :
-						e.text = e.text.replace(regex, replacement)
+		paragraphArray = []
+
+		for elem in self._doc :
+			paragraph = ''
+			if elem.tag == '{' + defaults.WPREFIXES['w'] + '}'  + 'p' :
+				for el in elem :
+					for l in el :
+						if l.tag == '{' + defaults.WPREFIXES['w'] + '}'  + 't' :
+							paragraph = paragraph + l.text
+				
+				self._doc.remove(elem)
+				if len(paragraph) > 0 :
+					paragraphArray.append(paragraph)
+
+		for para in paragraphArray :
+			self.addText(para.replace(regex, replacement))
+
+
+	def _addParagraph(self, text) :
+		p = Element().createElement('p')
+		r = Element().createElement('r')
+		t = Element().createElement('t')
+		t.text = text
+		r.append(t)
+		p.append(r)
+
+		self.addElement(p)
 
 	#search position of paragraph
 	def _searchParagraphPosition(self, text):
@@ -456,21 +480,23 @@ class HeaderFile :
 		self.xmlString.append(p)
 
 	def searchAndReplace(self, regex, replacement) :
-		#clean start of new header file TODO: copying styles etc.
-		_tempXmlString = self.xmlString
-		self.xmlString = etree.fromstring(self._defaultHeader)
-		
-		for elem in _tempXmlString.iter() :
+		paragraphArray = []
+
+		for elem in self.xmlString :
 			paragraph = ''
 			if elem.tag == '{' + defaults.WPREFIXES['w'] + '}p' :
-				for el in elem.iter() :
-					if el.tag == '{' + defaults.WPREFIXES['w'] + '}t' :
-						paragraph = paragraph + el.text
-						
-				if paragraph != '' :
-					self.addText(paragraph.replace(regex, replacement))
-					paragraph = ''
+				for el in elem :
+					for l in el : #run
+						if l.tag == '{' + defaults.WPREFIXES['w'] + '}t' :
+							paragraph = paragraph + l.text
 
+				self.xmlString.remove(elem)
+				if len(paragraph) > 0 :
+					paragraphArray.append(paragraph)
+
+		for para in paragraphArray :
+			self.addText(para.replace(regex, replacement))
+		
 	def getXml(self) :
 		return etree.tostring(self.xmlString, pretty_print=True)
 
@@ -507,19 +533,22 @@ class FooterFile :
 		self.xmlString.append(p)
 		
 	def searchAndReplace(self, regex, replacement) :
-		#clean start of new footer file TODO: copying styles and tabs
-		_tempXmlString = self.xmlString
-		self.xmlString = etree.fromstring(self._defaultFooter)
+		paragraphArray = []
 
-		for elem in _tempXmlString.iter() :
+		for elem in self.xmlString :
 			paragraph = ''
 			if elem.tag == '{' + defaults.WPREFIXES['w'] + '}p' :
-				for el in elem.iter() :
-					if el.tag == '{' + defaults.WPREFIXES['w'] + '}t' :
-						paragraph = paragraph + el.text
-				if paragraph != '' :
-					self.addText(paragraph.replace(regex, replacement))
-					paragraph = ''
+				for el in elem :
+					for l in el : #run
+						if l.tag == '{' + defaults.WPREFIXES['w'] + '}t' :
+							paragraph = paragraph + l.text
+
+				self.xmlString.remove(elem)
+				if len(paragraph) > 0 :
+					paragraphArray.append(paragraph)
+
+		for para in paragraphArray :
+			self.addText(para.replace(regex, replacement))
 
 	def getXml(self) :
 		return etree.tostring(self.xmlString, pretty_print=True)
