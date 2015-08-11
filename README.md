@@ -4,6 +4,7 @@ Simple docx and xlsx editor written in python.
 
 Changelog:
 ##### 11-08-2015
+- Improved searchAndReplace (footer,header,document)
 - Fix: looping through paragraphs in searchAndReplace
 - Improved search and replace function in headerfile
 
