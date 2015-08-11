@@ -3,6 +3,10 @@
 Simple docx and xlsx editor written in python.
 
 Changelog:
+##### 11-08-2015
+- Fix: looping through paragraphs in searchAndReplace
+- Improved search and replace function in headerfile
+
 ##### 10-08-2015
 - Fix: double reference when adding footer[].xml
 - Improved search and replace function in FooterFile
