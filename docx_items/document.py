@@ -57,9 +57,16 @@ class DocumentRelationshipFile() :
 			else :
 				file = 'header2.xml'
 
-			attr = {'Id' : 'rId' + str(new_id), 'Type' : defaults.WPREFIXES['r'] + '/header', 'Target' : file}
-			rel = Element().createElement('Relationship', prefix=None, attr=attr)
-			self._rels.append(rel)
+			alreadyInList = False
+			for elem in self._rels :
+					if elem.attrib['Target'] == file :
+						alreadyInList = True
+						new_id = 0
+
+			if alreadyInList == False :
+				attr = {'Id' : 'rId' + str(new_id), 'Type' : defaults.WPREFIXES['r'] + '/header', 'Target' : file}
+				rel = Element().createElement('Relationship', prefix=None, attr=attr)
+				self._rels.append(rel)
 
 		if type == 'footer' :
 			if headerfootertype == 'even' :
@@ -420,32 +427,61 @@ class HeaderFile :
 
 	path = 'word/header{filenumber}.xml'
 	
-	def __init__(self, text, filenumber, xml=None) :
+	_defaultHeader = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+				<w:hdr xmlns:ve="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" xmlns:w10="urn:schemas-microsoft-com:office:word" xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:wne="http://schemas.microsoft.com/office/word/2006/wordml">
+				</w:hdr>"""
 
-		self.path = self.path.format(filenumber=filenumber)
-		self.text = text
+	def __init__(self, path, xml=None) :
 
-		self.xmlString = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-			<w:hdr xmlns:ve="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" xmlns:w10="urn:schemas-microsoft-com:office:word" xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:wne="http://schemas.microsoft.com/office/word/2006/wordml">
-			<w:p>
-			<w:pPr>
-			<w:pStyle w:val="Header"/>
-			</w:pPr>
-			<w:r>
-			<w:t>{text}</w:t>
-			</w:r>
-			</w:p>
-			</w:hdr>"""
+		self.path = path
+		
+		if xml is not None :
+			self.xmlString = xml
+		else :
+			self.xmlString = etree.fromstring(self._defaultHeader)
+
+	def addText(self, text) :
+		p = Element().createElement('p')
+		pPr = Element().createElement('pPr')
+		pStyle = Element().createElement('pStyle', attr={'val' : 'Header'})
+		pPr.append(pStyle)
+		r = Element().createElement('r')
+		t = Element().createElement('t')
+		t.text = text
+		r.append(t)
+
+		p.append(pPr)
+		p.append(r)
+		
+		self.xmlString.append(p)
 
 	def searchAndReplace(self, regex, replacement) :
-		self.text = self.text.replace(regex, replacement)
+		#clean start of new header file TODO: copying styles etc.
+		_tempXmlString = self.xmlString
+		self.xmlString = etree.fromstring(self._defaultHeader)
+		
+		for elem in _tempXmlString.iter() :
+			paragraph = ''
+			if elem.tag == '{' + defaults.WPREFIXES['w'] + '}p' :
+				print elem.attrib
+				for el in elem.iter() :
+					if el.tag == '{' + defaults.WPREFIXES['w'] + '}t' :
+						paragraph = paragraph + el.text
+						
+				if paragraph != '' :
+					self.addText(paragraph.replace(regex, replacement))
+					paragraph = ''
 
 	def getXml(self) :
-		return self.xmlString.format(text=self.text)
+		return etree.tostring(self.xmlString, pretty_print=True)
 
 class FooterFile :
 
 	path = 'word/footer{filenumber}.xml'
+
+	_defaultFooter = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+				<w:ftr xmlns:ve="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" xmlns:w10="urn:schemas-microsoft-com:office:word" xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:wne="http://schemas.microsoft.com/office/word/2006/wordml">
+				</w:ftr>"""
 
 	def __init__(self, path, xml=None) :
 
@@ -454,9 +490,7 @@ class FooterFile :
 		if xml is not None :
 			self.xmlString = xml
 		else :
-			self.xmlString = etree.fromstring("""<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-				<w:ftr xmlns:ve="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" xmlns:w10="urn:schemas-microsoft-com:office:word" xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:wne="http://schemas.microsoft.com/office/word/2006/wordml">
-				</w:ftr>""")
+			self.xmlString = etree.fromstring(self._defaultFooter)
 
 	def addText(self, text) :
 		p = Element().createElement('p')
@@ -474,15 +508,19 @@ class FooterFile :
 		self.xmlString.append(p)
 		
 	def searchAndReplace(self, regex, replacement) :
-		for elem in self.xmlString.iter() :
+		#clean start of new footer file TODO: copying styles and tabs
+		_tempXmlString = self.xmlString
+		self.xmlString = etree.fromstring(self._defaultFooter)
+
+		for elem in _tempXmlString.iter() :
 			paragraph = ''
 			if elem.tag == '{' + defaults.WPREFIXES['w'] + '}p' :
 				for el in elem.iter() :
 					if el.tag == '{' + defaults.WPREFIXES['w'] + '}t' :
 						paragraph = paragraph + el.text
 				if paragraph != '' :
-					self.xmlString.remove(elem)
 					self.addText(paragraph.replace(regex, replacement))
+					paragraph = ''
 
 	def getXml(self) :
 		return etree.tostring(self.xmlString, pretty_print=True)
