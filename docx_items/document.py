@@ -256,22 +256,69 @@ class DocumentFile :
 					break
 
 	def searchAndReplace(self, regex, replacement) :
-		paragraphArray = []
+		newElements = []
 
-		for elem in self._doc :
-			paragraph = ''
-			if elem.tag == '{' + defaults.WPREFIXES['w'] + '}'  + 'p' :
-				for el in elem :
-					for l in el :
-						if l.tag == '{' + defaults.WPREFIXES['w'] + '}'  + 't' :
-							paragraph = paragraph + l.text
-				
-				self._doc.remove(elem)
-				if len(paragraph) > 0 :
-					paragraphArray.append(paragraph)
+		for bodyEle in self._doc.iter() :
+			if bodyEle.tag == '{' + defaults.WPREFIXES['w'] + '}body' :
+				for elem in bodyEle :
+					paragraph = ''
+					if elem.tag == '{' + defaults.WPREFIXES['w'] + '}'  + 'p' :
+						for el in elem :
+							if el.tag == '{' + defaults.WPREFIXES['w'] + '}'  + 'r' :
+								for l in el :
+									if l.tag == '{' + defaults.WPREFIXES['w'] + '}'  + 't' :
+										paragraph = paragraph + l.text
+ 				
+ 					#check of paragraph contains regex
+ 					if regex in paragraph :
+ 						startPosition = paragraph.index(regex) - 1
+ 						endPosition = startPosition + len(regex)
+ 						
+ 						cursorPosition = startPosition
+						charCount = 0
+ 						replacePosition = 0
+ 						for el in elem :
+							if el.tag == '{' + defaults.WPREFIXES['w'] + '}'  + 'r' :
+								for l in el :
+									if l.tag == '{' + defaults.WPREFIXES['w'] + '}'  + 't' :
+										
+										if charCount <= startPosition <= (charCount + len(l.text)) or charCount <= endPosition <= (charCount + len(l.text)) :
+											
+											#create temp list for replacing at specific position
+											tempList = []
+											for i in l.text :
+												tempList.append(i)
 
-		for para in paragraphArray :
-			self.addText(para.replace(regex, replacement))
+											#loop with cursor through text
+											while (len(l.text) - cursorPosition >= 0) :
+												
+												#check for replacements with different length
+												if len(replacement) > (replacePosition) :
+													tempList[cursorPosition - 1] = replacement[replacePosition]
+												else :
+													tempList[cursorPosition - 1] = ''
+												
+											 	#only update replacePosition when is not at end of string
+											 	if replacePosition < (len(regex) - 1) :
+													replacePosition += 1
+												else :
+													#add other characters after latest cursor position
+													if len(regex) < len(replacement) :
+														tempList[cursorPosition - 1] = tempList[cursorPosition - 1] + replacement[replacePosition:]
+													break
+
+												cursorPosition += 1
+												
+											
+											#clear old text element and fill with temp list
+											l.text = ''
+											for char in tempList :
+												l.text = l.text + char
+
+											#reset cursorPosition
+											cursorPosition = 1
+											
+										charCount = charCount + len(l.text)
 
 
 	def _addParagraph(self, text) :
