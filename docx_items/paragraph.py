@@ -24,7 +24,8 @@ class Paragraph :
 			'underline' : False,
 			'uppercase' : False,
 			'color' : False,
-			'font' : False
+			'font' : False,
+			'size' : False
 		}
 
 		if styles is not None :
@@ -73,6 +74,8 @@ class Paragraph :
 				self._prop.append(Element().createElement('color', attr={'val' : self._styles['color'].replace('#', '')}))
 		if self._styles['font'] is not False :
 			self._prop.append(Element().createElement('rFonts', attr={'ascii' : self._styles['font'], 'hAnsi' : self._styles['font']}))
+		if self._styles['size'] is not False :
+			self._prop.append(Element().createElement('sz', attr={'val' : str(self._styles['size'] * 2)}))
 
 	def get(self) :
 		return self.para
