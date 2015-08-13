@@ -1,6 +1,6 @@
 import math
 from lxml import etree
-from element import Element
+from universal.element import Element
 
 _basic = """<w:tbl>
 				<w:tblPr>
@@ -72,11 +72,11 @@ class Table :
 
 		self._table.append(tblGrid)
 
-	def addRow(self, val) :
+	def addRow(self, val, style='default') :
 		row = self._getNewRow()
 
 		for v in val :
-			column = self._getNewColumn()
+			column = self._getNewColumn(style)
 			
 			textEl = Element().createElement('t')
 			textEl.text = v
@@ -99,10 +99,24 @@ class Table :
 	def _getNewRow(self) :
 		return Element().createElement('tr')
 
-	def _getNewColumn(self) :
+	def _getNewColumn(self, style) :
 		column = Element().createElement('tc')
 		tcPr = Element().createElement('tcPr')
 		tcPr.append(Element().createElement('tcW', attr={'w' : str(self._columnWidth), 'type' : 'dxa'}))
+
+		if style == 'dashed' :
+			tcBorders = Element().createElement('tcBorders')
+			attr = {'val' : 'dashed', 'sz' : '4', 'space' : '0', 'color' : 'auto'}
+			top = Element().createElement('top', attr=attr)
+			left = Element().createElement('left', attr=attr)
+			bottom = Element().createElement('bottom', attr=attr)
+			right = Element().createElement('right', attr=attr)
+			tcBorders.append(top)
+			tcBorders.append(left)
+			tcBorders.append(bottom)
+			tcBorders.append(right)
+			tcPr.append(tcBorders)
+
 		column.append(tcPr)
 
 		return column
