@@ -53,7 +53,7 @@ document = Document()
 #paragraph
 document.addParagraph("vanuit python toegevoegd onderaan", styles={'bold' : True, 'italic' : True, 'underline' : 'red', 
 					'uppercase' : True, 'color' : 'red', 'font' : 'Times New Roman'})
-document.addParagraph("vanuit python toegevoegd na klaas", 'aftertext:klaas')
+document.addParagraph("vanuit python toegevoegd na klaas", 'aftertext:klaas', styles={'size' : 18})
 
 #search and replace
 document.searchAndReplace("klaas", "jan")
@@ -69,9 +69,9 @@ document.insertBreak('page')
 
 #add table with 3 columns
 table = document.addTable(5000, 3)
-table.addRow(['test1', 'test2', 'test3'])
-table.addRow(['test4', 'test5', 'test6'])
-table.addRow(['test7', 'test8', 'test9'])
+table.addRow(['test1', 'test2', 'test3'], 'dashed')
+table.addRow(['test4', 'test5', 'test6'], 'dashed')
+table.addRow(['test7', 'test8', 'test9'], 'dashed')
 document.closeTable(table)
 #add table with 2 columns at top
 table = document.addTable(5000, 2, position='first')
@@ -106,7 +106,7 @@ document.addImage('image1.jpg', width='30%', height='30%', url='http://www.tweak
 #pagebreak
 document.insertBreak('page')
 document.addParagraph("vanuit python toegevoegd onderaan", styles={'bold' : True, 'italic' : True, 'underline' : 'red', 
-					'uppercase' : True, 'color' : 'red', 'font' : 'Times New Roman'})
+					'uppercase' : True, 'color' : 'red', 'font' : 'Times New Roman', 'size' : 22})
 
 # adding headers
 document.addHeader('Header tekst odd pages', 'even')
