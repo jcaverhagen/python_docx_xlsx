@@ -40,7 +40,8 @@ document.closeList(numberedList)
 
 document.addImage('image.jpg', width='20%', height='20%', url='http://www.nu.nl')
 
-document.addHeader('Header tekst eerste pagina', 'first')
+document.addHeader('Header tekst')
+document.addFooter('Footer tekst')
 
 document.save("test1.docx")
 
@@ -108,11 +109,11 @@ document.addParagraph("vanuit python toegevoegd onderaan", styles={'bold' : True
 					'uppercase' : True, 'color' : 'red', 'font' : 'Times New Roman'})
 
 # adding headers
-document.addHeader('Header tekst even pages', 'even')
-document.addHeader('Header tekst odd pages', 'default')
+document.addHeader('Header tekst odd pages', 'even')
+document.addHeader('Header tekst even pages', 'default')
 
 document.addFooter('Default footer text', 'default')
-document.addFooter('Different footer text', 'first')
+document.addFooter('Different footer text', 'even')
 
 #search and replace on headers
 document.searchAndReplace("odd pages", "oneven paginas")
