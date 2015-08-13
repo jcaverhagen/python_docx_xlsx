@@ -1,3 +1,4 @@
+import string
 from datetime import datetime
 from universal.element import Element
 from lxml import etree
@@ -220,6 +221,13 @@ class SheetFile :
 			</worksheet>""")
 
 	def setColumnSize(self, column, size) :
+		if column.isdigit() == False :
+			newColumn = 0
+			if len(column) > 1 :
+				newColumn = (len(column) - 1) * 26
+			newColumn += (string.ascii_uppercase.index(column[-1:].upper()) + 1)
+			column = newColumn
+			
 		col = Element().createElement('col', attr={'min' : str(column), 'max' : str(column), 'width' : str(size), 'customWidth' : '1'}, prefix='e', attrprefix=None)
 
 		added = False
