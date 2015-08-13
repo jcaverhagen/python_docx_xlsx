@@ -2,6 +2,7 @@ from datetime import datetime
 from universal.element import Element
 from lxml import etree
 from universal import defaults
+from universal.functions import Functions
 
 class RelationshipFile() :
 
@@ -271,56 +272,11 @@ class DocumentFile :
  				
  					#check of paragraph contains regex
  					if regex in paragraph :
- 						startPosition = paragraph.index(regex) - 1
- 						endPosition = startPosition + len(regex)
+ 						startPosition = paragraph.index(regex) + 1
+ 						endPosition = startPosition + (len(regex) - 1)
  						
- 						cursorPosition = startPosition
-						charCount = 0
- 						replacePosition = 0
- 						for el in elem :
-							if el.tag == '{' + defaults.WPREFIXES['w'] + '}'  + 'r' :
-								for l in el :
-									if l.tag == '{' + defaults.WPREFIXES['w'] + '}'  + 't' :
-										
-										if charCount <= startPosition <= (charCount + len(l.text)) or charCount <= endPosition <= (charCount + len(l.text)) :
-											
-											#create temp list for replacing at specific position
-											tempList = []
-											for i in l.text :
-												tempList.append(i)
-
-											#loop with cursor through text
-											while (len(l.text) - cursorPosition >= 0) :
-												
-												#check for replacements with different length
-												if len(replacement) > (replacePosition) :
-													tempList[cursorPosition - 1] = replacement[replacePosition]
-												else :
-													tempList[cursorPosition - 1] = ''
-												
-											 	#only update replacePosition when is not at end of string
-											 	if replacePosition < (len(regex) - 1) :
-													replacePosition += 1
-												else :
-													#add other characters after latest cursor position
-													if len(regex) < len(replacement) :
-														tempList[cursorPosition - 1] = tempList[cursorPosition - 1] + replacement[replacePosition:]
-													break
-
-												cursorPosition += 1
-												
-											
-											#clear old text element and fill with temp list
-											l.text = ''
-											for char in tempList :
-												l.text = l.text + char
-
-											#reset cursorPosition
-											cursorPosition = 1
-											
-										charCount = charCount + len(l.text)
-
-
+ 						Functions().searchAndReplace(elem, regex, replacement, startPosition, endPosition)
+			
 	def _addParagraph(self, text) :
 		p = Element().createElement('p')
 		r = Element().createElement('r')
@@ -329,7 +285,7 @@ class DocumentFile :
 		r.append(t)
 		p.append(r)
 
-		self.addElement(p)
+		return p
 
 	#search position of paragraph
 	def _searchParagraphPosition(self, text):
@@ -527,8 +483,6 @@ class HeaderFile :
 		self.xmlString.append(p)
 
 	def searchAndReplace(self, regex, replacement) :
-		paragraphArray = []
-
 		for elem in self.xmlString :
 			paragraph = ''
 			if elem.tag == '{' + defaults.WPREFIXES['w'] + '}p' :
@@ -537,12 +491,12 @@ class HeaderFile :
 						if l.tag == '{' + defaults.WPREFIXES['w'] + '}t' :
 							paragraph = paragraph + l.text
 
-				self.xmlString.remove(elem)
-				if len(paragraph) > 0 :
-					paragraphArray.append(paragraph)
+				#check of paragraph contains regex
+				if regex in paragraph :
+					startPosition = paragraph.index(regex) + 1
+					endPosition = startPosition + (len(regex) - 1)
 
-		for para in paragraphArray :
-			self.addText(para.replace(regex, replacement))
+					Functions().searchAndReplace(elem, regex, replacement, startPosition, endPosition)
 		
 	def getXml(self) :
 		return etree.tostring(self.xmlString, pretty_print=True)
@@ -580,8 +534,6 @@ class FooterFile :
 		self.xmlString.append(p)
 		
 	def searchAndReplace(self, regex, replacement) :
-		paragraphArray = []
-
 		for elem in self.xmlString :
 			paragraph = ''
 			if elem.tag == '{' + defaults.WPREFIXES['w'] + '}p' :
@@ -590,12 +542,12 @@ class FooterFile :
 						if l.tag == '{' + defaults.WPREFIXES['w'] + '}t' :
 							paragraph = paragraph + l.text
 
-				self.xmlString.remove(elem)
-				if len(paragraph) > 0 :
-					paragraphArray.append(paragraph)
-
-		for para in paragraphArray :
-			self.addText(para.replace(regex, replacement))
+				#check of paragraph contains regex
+				if regex in paragraph :
+					startPosition = paragraph.index(regex) + 1
+					endPosition = (startPosition + (len(regex) - 1))
+					
+					Functions().searchAndReplace(elem, regex, replacement, startPosition, endPosition)
 
 	def getXml(self) :
 		return etree.tostring(self.xmlString, pretty_print=True)
