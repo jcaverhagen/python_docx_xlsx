@@ -33,8 +33,8 @@ class Document :
                     self.files[path] = DocumentRelationshipFile(etree.fromstring(self._doc.read(path)))
                 if path == '[Content_Types].xml' :
                     self.files[path] = ContentTypeFile(etree.fromstring(self._doc.read(path)))
-                #if path == 'word/settings.xml' :
-                 #   self.files[path] = SettingsFile(etree.fromstring(self._doc.read(path)))
+                if path == 'word/settings.xml' :
+                    self.files[path] = SettingsFile(etree.fromstring(self._doc.read(path)))
 
                 if 'header' in path :
                     self.files[path] = HeaderFile(path, etree.fromstring(self._doc.read(path)))                
