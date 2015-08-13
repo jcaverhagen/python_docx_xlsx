@@ -116,11 +116,9 @@ class Document :
         if rel_id > 0 :
             self.doc.addReference('header', headertype, rel_id)
 
-        self.files['word/header' + str(filenumber) + '.xml'] = HeaderFile(text, str(filenumber))
+        self.files['word/header' + str(filenumber) + '.xml'] = HeaderFile('word/header' + str(filenumber) + '.xml', text=text)
 
         self.files['[Content_Types].xml'].addOverride('header', filenumber)
-
-        self.files['word/header' + str(filenumber) + '.xml'].addText(text)
 
         return self.files['word/header' + str(filenumber) + '.xml']
 
@@ -138,11 +136,9 @@ class Document :
         if rel_id > 0 :
             self.doc.addReference('footer', footertype, rel_id)
 
-        self.files['word/footer' + str(filenumber) + '.xml'] = FooterFile(str(filenumber))
+        self.files['word/footer' + str(filenumber) + '.xml'] = FooterFile('word/footer' + str(filenumber) + '.xml', text=text)
 
         self.files['[Content_Types].xml'].addOverride('footer', filenumber)
-
-        self.files['word/footer' + str(filenumber) + '.xml'].addText(text)
 
         return self.files['word/footer' + str(filenumber) + '.xml']
 
