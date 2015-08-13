@@ -8,10 +8,13 @@ sheet2 = document.addSheet()
 sheet1.addData('A2', '200', type='number')
 sheet1.addData('A3', '200', type='number')
 
-sheet1.setColumnSize(4, 20.2)
+sheet1.setColumnSize('D', 20.2)
 sheet1.addData('D2', '100')
 sheet1.addData('D3', '120')
 sheet1.addData('D4', '120')
+
+sheet1.setColumnSize('AB', 30)
+sheet1.setColumnSize('27', 8)
 
 sheet1.addData('D5', 'SUM(D2:D4)', type='formule')
 
