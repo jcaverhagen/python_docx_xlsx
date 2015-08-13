@@ -4,6 +4,7 @@ Simple docx and xlsx editor written in python.
 
 Changelog:
 ##### 13-08-2015
+- Keeping style file from old document
 - searchAndReplace optimize
 
 ##### 12-08-2015
