@@ -33,8 +33,8 @@ class Document :
                     self.files[path] = DocumentRelationshipFile(etree.fromstring(self._doc.read(path)))
                 if path == '[Content_Types].xml' :
                     self.files[path] = ContentTypeFile(etree.fromstring(self._doc.read(path)))
-                if path == 'word/settings.xml' :
-                    self.files[path] = SettingsFile(etree.fromstring(self._doc.read(path)))
+                #if path == 'word/settings.xml' :
+                 #   self.files[path] = SettingsFile(etree.fromstring(self._doc.read(path)))
 
                 if 'header' in path :
                     self.files[path] = HeaderFile(path, etree.fromstring(self._doc.read(path)))                
@@ -190,14 +190,10 @@ class Document :
             docxFile.writestr(StylesWithEffectsFile().path, StylesWithEffectsFile().getXml())
             
         else :
-            
             #copy from old docx every file except the files that are in files list
             for path in self._doc.namelist() :
                 if path not in self.files :
-                    if path == 'word/styles.xml' :
-                        styleFile = etree.fromstring(StyleFile().getXml())
-                        docxFile.writestr('word/styles.xml', etree.tostring(styleFile))
-                    else : docxFile = self.copyToXML(docxFile, path)
+                    docxFile = self.copyToXML(docxFile, path)
 
         #add files from file list to docx
         for key, value in self.files.items() :
