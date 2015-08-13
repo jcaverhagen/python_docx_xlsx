@@ -1,6 +1,6 @@
 from lxml import etree
-from element import Element
-import defaults
+from universal.element import Element
+from universal import defaults
 
 _basic = """<w:p>
 				<w:pPr>
