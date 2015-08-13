@@ -219,6 +219,23 @@ class SheetFile :
 			<pageMargins left="0.7" right="0.7" top="0.75" bottom="0.75" header="0.3" footer="0.3"/>
 			</worksheet>""")
 
+	def setColumnSize(self, column, size) :
+		col = Element().createElement('col', attr={'min' : str(column), 'max' : str(column), 'width' : str(size), 'customWidth' : '1'}, prefix='e', attrprefix=None)
+
+		added = False
+		for elem in self.xmlString.iter() :
+			if elem.tag == '{' + defaults.WPREFIXES['e'] + '}cols' :
+				elem.append(col)
+				added = True
+
+		if added == False :
+			cols = Element().createElement('cols', prefix='e')
+			cols.append(col)
+
+			for elem in self.xmlString.iter() :
+				if elem.tag == '{' + defaults.WPREFIXES['e'] + '}sheetFormatPr' :
+					elem.addnext(cols)
+
 	def addData(self, column, value, type='number') :
 		for elem in self.xmlString.iter() :
 			if elem.tag == '{' + defaults.WPREFIXES['e'] + '}sheetData' :
