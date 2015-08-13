@@ -35,9 +35,13 @@ class Document :
                     self.files[path] = ContentTypeFile(etree.fromstring(self._doc.read(path)))
                 if path == 'word/settings.xml' :
                     self.files[path] = SettingsFile(etree.fromstring(self._doc.read(path)))
-                
+
+                if 'header' in path :
+                    self.files[path] = HeaderFile(path, etree.fromstring(self._doc.read(path)))                
+
                 if 'footer' in path :
                     self.files[path] = FooterFile(path, etree.fromstring(self._doc.read(path)))
+
         else :
             self.files['word/document.xml'] = DocumentFile()
             self.files['word/_rels/document.xml.rels'] = DocumentRelationshipFile()
@@ -109,11 +113,16 @@ class Document :
             filenumber = 2
 
         rel_id = self.files['word/_rels/document.xml.rels'].addRelation('header', headerfootertype=headertype)
+        if rel_id > 0 :
+            self.doc.addReference('header', headertype, rel_id)
+
         self.files['word/header' + str(filenumber) + '.xml'] = HeaderFile(text, str(filenumber))
 
         self.files['[Content_Types].xml'].addOverride('header', filenumber)
 
-        self.doc.addReference('header', headertype, rel_id)
+        self.files['word/header' + str(filenumber) + '.xml'].addText(text)
+
+        return self.files['word/header' + str(filenumber) + '.xml']
 
     #add footer
     def addFooter(self, text, footertype='Default') :
@@ -128,11 +137,12 @@ class Document :
         rel_id = self.files['word/_rels/document.xml.rels'].addRelation('footer', headerfootertype=footertype)
         if rel_id > 0 :
             self.doc.addReference('footer', footertype, rel_id)
+
         self.files['word/footer' + str(filenumber) + '.xml'] = FooterFile(str(filenumber))
 
         self.files['[Content_Types].xml'].addOverride('footer', filenumber)
 
-        self.files['word/footer' + str(filenumber) + '.xml'].addText(text) 
+        self.files['word/footer' + str(filenumber) + '.xml'].addText(text)
 
         return self.files['word/footer' + str(filenumber) + '.xml']
 
@@ -203,7 +213,7 @@ class Document :
     #search and replace function
     def searchAndReplace(self, regex, replacement) :
         for key, value in self.files.items() :
-            if key != 'word/_rels/document.xml.rels' and key != '[Content_Types].xml' and key != 'word/settings.xml': 
+            if key != 'word/_rels/document.xml.rels' and key != '[Content_Types].xml' and key != 'word/settings.xml':
                 value.searchAndReplace(regex, replacement)
 
     #copying file from old zip to new zip
