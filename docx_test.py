@@ -43,7 +43,7 @@ document.addImage('image.jpg', width='20%', height='20%', url='http://www.nu.nl'
 document.addHeader('Header tekst')
 document.addFooter('Footer tekst')
 
-document.save("test1.docx")
+document.save("test1.docx", readOnly=True)
 
 """
 NEW DOCUMENT WITH NO INPUT FILE, CREATING FROM SCRATCH
@@ -122,4 +122,4 @@ document.searchAndReplace("even pages", "even paginas")
 #add anchor
 document.makeTextHyperlink("vanuit", "python", anchor='anker')
 
-document.save("test2.docx")
+document.save("test2.docx", readOnly=True)
