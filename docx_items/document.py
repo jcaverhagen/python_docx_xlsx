@@ -6,18 +6,38 @@ from universal.functions import Functions
 
 class RelationshipFile() :
 
+	xmlString = ''
 	path = '_rels/.rels'
 
-	def __init__(self) :
-		self.xmlString = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-			<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
-			<Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/extended-properties" Target="docProps/app.xml"/>
-			<Relationship Id="rId2" Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties" Target="docProps/core.xml"/>
-			<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>
-			</Relationships>"""
+	def __init__(self, xml=None) :
+		if xml is not None :
+			self.xmlString = xml
+		else :
+			self.xmlString = etree.fromstring("""<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+				<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+				<Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/extended-properties" Target="docProps/app.xml"/>
+				<Relationship Id="rId2" Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties" Target="docProps/core.xml"/>
+				<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>
+				</Relationships>""")
+
+	def addRelation(self, type) :
+		new_id = self._getHighestRelationId() + 1
+		if type == 'custom' :
+			attr = {'Id' : 'rId' + str(new_id), 'Type' : defaults.WPREFIXES['r'] + '/custom-properties', 'Target' : 'docProps/custom.xml'}
+			rel = Element().createElement('Relationship', prefix=None, attr=attr)
+			self.xmlString.append(rel)
+
+	#search for highest id in relations xml
+	def _getHighestRelationId(self) :
+		highest = 0
+		for rel in self.xmlString :
+			if int(rel.attrib['Id'].replace('rId', '')) > highest :
+				highest = int(rel.attrib['Id'].replace('rId', ''))
+
+		return highest
 
 	def getXml(self) :
-		return self.xmlString
+		return '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' + etree.tostring(self.xmlString, pretty_print=True)
 
 class DocumentRelationshipFile() :
 
@@ -154,6 +174,24 @@ class CoreFile :
 		created = datetime.strftime(datetime.today(), '%Y-%m-%dT%H:%M:%SZ')
 		return self.xmlString.format(creator=self.props.get('creator', ''),
 									created=created)
+
+class CustomFile :
+
+	path = 'docProps/custom.xml'
+	
+	def __init__(self, xml=None) :
+		if xml is not None :
+			self.xmlString = xml
+		else :
+			self.xmlString = etree.fromstring("""<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+				<Properties xmlns="http://schemas.openxmlformats.org/officeDocument/2006/custom-properties" xmlns:vt="http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes">
+				<property fmtid="{D5CDD505-2E9C-101B-9397-08002B2CF9AE}" pid="2" name="_MarkAsFinal">
+				<vt:bool>true</vt:bool>
+				</property>
+				</Properties>""")
+
+	def getXml(self) :
+		return etree.tostring(self.xmlString, pretty_print=True)
 
 class DocumentFile :
 
@@ -366,32 +404,35 @@ class ContentTypeFile() :
 		if alreadyExists == False :
 			self.xmlString.append(self.imageExtensions[extension])
 
-	def addOverride(self, type, filenumber) :
+	def addOverride(self, type, filenumber=None) :
 		if type == 'header' :
 			PartName = '/word/header' + str(filenumber) + '.xml'
 			ContentType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.header+xml'
 
-			notInXml = True
-			for over in self.xmlString.iter() :
-				if over.tag == '{' + defaults.WPREFIXES['ct'] + '}' + 'Override' :
-					if over.attrib['PartName'] == PartName :
-						notInXml = False
+			self._addOveride(PartName, ContentType)
 
-			if notInXml :
-				self.xmlString.append(Element().createElement('Override', attr={'PartName' : PartName, 'ContentType' : ContentType}, prefix=None, attrprefix=None))
 		elif type == 'footer' :
 			PartName = '/word/footer' + str(filenumber) + '.xml'
 			ContentType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.footer+xml'
 
-			notInXml = True
-			for over in self.xmlString.iter() :
-				if over.tag == '{' + defaults.WPREFIXES['ct'] + '}' + 'Override' :
-					if over.attrib['PartName'] == PartName :
-						notInXml = False
+			self._addOveride(PartName, ContentType)
 
-			if notInXml :
-				self.xmlString.append(Element().createElement('Override', attr={'PartName' : PartName, 'ContentType' : ContentType}, prefix=None, attrprefix=None))
-		
+		elif type == 'custom' :
+			PartName = '/docProps/custom.xml'
+			ContentType = 'application/vnd.openxmlformats-officedocument.custom-properties+xml'
+
+			self._addOveride(PartName, ContentType)
+	
+	def _addOveride(self, PartName, ContentType) :
+		notInXml = True
+		for over in self.xmlString.iter() :
+			if over.tag == '{' + defaults.WPREFIXES['ct'] + '}' + 'Override' :
+				if over.attrib['PartName'] == PartName :
+					notInXml = False
+
+		if notInXml :
+			self.xmlString.append(Element().createElement('Override', attr={'PartName' : PartName, 'ContentType' : ContentType}, prefix=None, attrprefix=None))
+
 	def getXml(self) :
 		return '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' + etree.tostring(self.xmlString, pretty_print=True)
 
