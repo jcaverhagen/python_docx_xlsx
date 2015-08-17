@@ -3,9 +3,12 @@
 Simple docx and xlsx editor written in python.
 
 Changelog:
+##### 17-08-2015
+- Implemented save as readonly
+
 ##### 13-08-2015
 - Added support for setting column size with alphabetic characters, A, B, C, AA, BB, CC, EEEE
-- Implemented columnsize in xlsx
+- Implemented column size in xlsx
 - Implemented dashed borders for tables and paragraph fontsize
 - Fix: test and reference in paragraph.py
 - Keeping style file from old document
