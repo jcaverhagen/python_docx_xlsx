@@ -7,7 +7,7 @@ from docx_items.table import Table
 from docx_items.list import List
 from docx_items.image import Image
 from docx_items.document import (
- StyleFile, AppFile, RelationshipFile, DocumentRelationshipFile, CoreFile, DocumentFile, HeaderFile, FooterFile,
+ StyleFile, AppFile, RelationshipFile, DocumentRelationshipFile, CoreFile, DocumentFile, HeaderFile, FooterFile, CustomFile,
  ContentTypeFile, NumberingFile, SettingsFile, FontTableFile, StylesWithEffectsFile, WebSettingsFile, ThemeFile
 )
 from PIL import Image as PILImage
@@ -35,6 +35,8 @@ class Document :
                     self.files[path] = ContentTypeFile(etree.fromstring(self._doc.read(path)))
                 if path == 'word/settings.xml' :
                     self.files[path] = SettingsFile(etree.fromstring(self._doc.read(path)))
+                if path == '_rels/.rels' :
+                    self.files[path] = RelationshipFile(etree.fromstring(self._doc.read(path)))
 
                 if 'header' in path :
                     self.files[path] = HeaderFile(path, etree.fromstring(self._doc.read(path)))                
@@ -44,6 +46,7 @@ class Document :
 
         else :
             self.files['word/document.xml'] = DocumentFile()
+            self.files['_rels/.rels'] = RelationshipFile()
             self.files['word/_rels/document.xml.rels'] = DocumentRelationshipFile()
             self.files['[Content_Types].xml'] = ContentTypeFile()
             self.files['word/settings.xml'] = SettingsFile()
@@ -172,10 +175,9 @@ class Document :
         self.doc.addElement(breakEl.get(), position)
 
     #save document with new values
-    def save(self, filename) :
+    def save(self, filename, readOnly=False) :
         docxFile = zipfile.ZipFile(filename, mode='w', compression=zipfile.ZIP_DEFLATED)
         if not self.filename :
-            docxFile.writestr(RelationshipFile().path, RelationshipFile().getXml())
             docxFile.writestr(AppFile().path, AppFile().getXml())
             docxFile.writestr(CoreFile().path, CoreFile().getXml())
             docxFile.writestr(NumberingFile().path, NumberingFile().getXml())
@@ -191,6 +193,13 @@ class Document :
                 if path not in self.files :
                     docxFile = self.copyToXML(docxFile, path)
 
+        #make file readonly
+        if readOnly :
+            docxFile.writestr(CustomFile().path, CustomFile().getXml())
+
+            self.files['_rels/.rels'].addRelation('custom')
+            self.files['[Content_Types].xml'].addOverride('custom')
+
         #add files from file list to docx
         for key, value in self.files.items() :
             docxFile.writestr(key, value.getXml())
@@ -205,7 +214,7 @@ class Document :
     #search and replace function
     def searchAndReplace(self, regex, replacement) :
         for key, value in self.files.items() :
-            if key != 'word/_rels/document.xml.rels' and key != '[Content_Types].xml' and key != 'word/settings.xml':
+            if key != 'word/_rels/document.xml.rels' and key != '[Content_Types].xml' and key != 'word/settings.xml' and key != '_rels/.rels' :
                 value.searchAndReplace(regex, replacement)
 
     #copying file from old zip to new zip
